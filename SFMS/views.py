@@ -6,4 +6,7 @@ def index(response):
     return HttpResponse('<h1>Student File Management System<h1>')
 
 def StudentLogin(response):
-    return render (response, "SFMS/StudentLogin.html")
+    return render (response, "StudentLogin.html")
+
+def notfound(response):
+    return render(response, "404.html")
