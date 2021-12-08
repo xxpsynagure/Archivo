@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>404 : CGV : Online Certificate Verification System </title>
-  <link href="{{ url_for('static', filename='css/404.css') }}" rel="stylesheet">
+  <link href="css/404.css" rel="stylesheet">
      <!-- Favicons -->
-  <link href="{{ url_for('static', filename='images/favicon/favicon.ico') }}" rel="icon">
-  <link href="{{ url_for('static', filename='images/favicon/apple-touch-icon.png') }}" rel="apple-touch-icon">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
+
   <style>
       .dark-mode , .dark-mode .row , .dark-mode .text-center a
     {
@@ -27,48 +25,46 @@ color:#fff;
 </style>
 </head>
 <body>
-  <input type="checkbox" id="toggle" name="checkbox" class="switch" onclick="myfun()">
-<!-- partial:index.partial.html -->
-<div class="box">
-  <div class="box__ghost">
-    <div class="symbol"></div>
-    <div class="symbol"></div>
-    <div class="symbol"></div>
-    <div class="symbol"></div>
-    <div class="symbol"></div>
-    <div class="symbol"></div>
-    
-    <div class="box__ghost-container">
-      <div class="box__ghost-eyes">
-        <div class="box__eye-left"></div>
-        <div class="box__eye-right"></div>
+  <a href="" target="_blank">
+    <header class="top-header">
+  </header>
+  
+  <!--dust particel-->
+  <div>
+    <div class="starsec"></div>
+    <div class="starthird"></div>
+    <div class="starfourth"></div>
+    <div class="starfifth"></div>
+  </div>
+  <!--Dust particle end--->
+  
+  
+  <div class="lamp__wrap">
+    <div class="lamp">
+      <div class="cable"></div>
+      <div class="cover"></div>
+      <div class="in-cover">
+        <div class="bulb"></div>
       </div>
-      <div class="box__ghost-bottom">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+      <div class="light"></div>
+    </div>
+  </div>
+  <!-- END Lamp -->
+  <section class="error">
+    <!-- Content -->
+    <div class="error__content">
+      <div class="error__message message">
+        <h1 class="message__title">Page Not Found</h1>
+        <p class="message__text">We're sorry, the page you were looking for isn't found here. The link you followed may either be broken or no longer exists. Please try again, or take a look at our.</p>
+      </div>
+      <div class="error__nav e-nav">
+        <a href="" target="_blanck" class="e-nav__link"></a>
       </div>
     </div>
-    <div class="box__ghost-shadow"></div>
-  </div>
+    <!-- END Content -->
   
-  <div class="box__description">
-    <div class="box__description-container">
-      <div class="box__description-title">Whoops!</div>
-      <div class="box__description-text">It seems like we couldn't find the page you were looking for</div>
-    </div>
-    
-    <a href="/" target="_blank" class="box__button">Go back</a>
-    
-  </div>
+  </section>
   
-</div>
-<!-- partial -->
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-<script src="{{ url_for('static', filename='js/404.js') }}"></script>
-        <!-- js for dark mode -->
-        <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
+    </a>
 </body>
 </html>
