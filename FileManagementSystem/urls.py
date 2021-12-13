@@ -20,3 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("SFMS.urls")),
 ]
+
+handler404 = 'SFMS.views.error_404'
+#handler500 = 'SFMS.views.error_500'
