@@ -24,7 +24,7 @@
                 <div class="signup-content">
                     <div class="signup-form">
                         <h2 class="form-title">Sign up</h2>
-                        <form method="POST" class="register-form" id="register-form">{%csrf_token%}
+                        <form action="/doReg" method="POST" class="register-form" id="register-form">{%csrf_token%}
                             <!--
                             <div class="form-group">
                                 <label for="name"><i class="zmdi zmdi-account material-icons-name"></i></label>
@@ -49,8 +49,8 @@
                                 
                                 <select name="college" id="college">
                                 <option value="first" disabled selected>Select your option</option>
-                                <option value="sjec">St Joseph Engineering College</option>
-                                <option value="scem">Sahyadri College of Engineering and Management</option>
+                                <option value="SJEC">St Joseph Engineering College</option>
+                                <option value="SCEM">Sahyadri College of Engineering and Management</option>
                             </select>
                             </div>
 
@@ -59,10 +59,10 @@
                                 
                                 <select name="branch" id="branch">
                                 <option value="" disabled selected>Select your option</option>
-                                <option value="cse">Computer Science and Engineering</option>
-                                <option value="mech">Mechanical Engineering</option>
-                                <option value="ec">Electronics and Communication Engineering</option>
-                                <option value="civil">Civil Engineering</option>
+                                <option value="CSE">Computer Science and Engineering</option>
+                                <option value="MECH">Mechanical Engineering</option>
+                                <option value="EC">Electronics and Communication Engineering</option>
+                                <option value="CIV">Civil Engineering</option>
                                 </select>
                             </div>
 
