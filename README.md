@@ -6,4 +6,6 @@
 
 * whenever you create a new applicatio, add it to the settings.py --> INSTALLED_APPS >> `appname.apps.AppnameConfig`
 
-* created virtual environment venv and pip installed django and mysqlclient (requirements.txt)
+* create virtual environment venv - `pip install virtualenv`  `virtualenv [directory]` 
+* use for this project (I do always)
+* and pip install django and mysqlclient (requirements.txt) in the venv
