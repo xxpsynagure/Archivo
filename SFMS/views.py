@@ -26,9 +26,6 @@ def StudentReg(request):
     for item in cur:
         branch[item[0]] = item[1]
         colli.append(item[2])
-
-    print(colli)
-    print(branch)
     
     return render(request, 'StudentReg.html', {'params':params}|{'branch':branch}|{'colli':colli})
 
@@ -78,14 +75,19 @@ def doReg(request):
         branch =request.POST.get("branch")
         passw = request.POST.get("pass")
         re_pass =request.POST.get("re_pass")
+        
+        if (request.META['HTTP_REFERER'][22:]) == 'TeacherReg/':
+            T_or_S = 'T'
+        else:
+            T_or_S = 'S'
 
         if(passw==re_pass):
             cursor = connections['default'].cursor()
-            cursor.execute(f"INSERT INTO Registration VALUES('{usn}','{user}','{email}',md5('{passw}'),'{branch}','{college}');")
+            cursor.execute(f"INSERT INTO Registration VALUES('{usn}','{user}','{email}',md5('{passw}'),'{branch}','{college}', '{T_or_S}');")
             return HttpResponse("<h2>Registration Successful</h2>")
         else:
             messages.error(request, "Password not matching, Please Try again")
-            return render(request,"StudentReg.html")
+            return redirect('TeacherReg')
 
 
 def trial(request): #trial purpose

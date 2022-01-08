@@ -12,6 +12,7 @@ Email VARCHAR(255) UNIQUE NOT NULL,
 Pass VARCHAR(255) NOT NULL,
 Branch VARCHAR(255),
 College VARCHAR(255) NOT NULL,
+T_or_S CHAR(1) NOT NULL,
 CONSTRAINT username_check CHECK (Username NOT LIKE '%[^A-Z0-9_]%'),
 CONSTRAINT email_check CHECK (Email LIKE '%___@___%.__%')
 );
