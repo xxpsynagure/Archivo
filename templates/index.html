@@ -142,6 +142,15 @@
             </div>
         </section>
          --> 
+        <section id="Error">
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </section>
         <!-- Footer-->
         <footer class="footer text-center">
             <div class="container px-4 px-lg-5">
