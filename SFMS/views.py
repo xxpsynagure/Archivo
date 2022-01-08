@@ -32,6 +32,22 @@ def StudentReg(request):
     
     return render(request, 'StudentReg.html', {'params':params}|{'branch':branch}|{'colli':colli})
 
+def TeacherReg(request):
+    cur = connections['default'].cursor()
+    cur.execute(f"SELECT * FROM College ")
+    params ={}
+    for item in cur:
+        params[item[0]]=item[1]
+    cur.execute(f"SELECT * FROM Branch")
+    branch = {}
+    colli = []
+    for item in cur:
+        branch[item[0]] = item[1]
+        colli.append(item[2])
+    
+    return render(request, 'TeacherReg.html', {'params':params}|{'branch':branch}|{'colli':colli})
+
+
 def error_404(request,exception):
     return render(request, "404.html")
 
@@ -68,7 +84,9 @@ def doReg(request):
             cursor.execute(f"INSERT INTO Registration VALUES('{usn}','{user}','{email}',md5('{passw}'),'{branch}','{college}');")
             return HttpResponse("<h2>Registration Successful</h2>")
         else:
+            messages.error(request, "Password not matching, Please Try again")
             return render(request,"StudentReg.html")
+
 
 def trial(request): #trial purpose
     posts = models.Registration.objects.all()
