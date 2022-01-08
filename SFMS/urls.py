@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("StudentLogin/", views.StudentLogin, name="StudentLogin"),
+    path("Login/", views.Login, name="Login"),
     path("StudentReg/",views.StudentReg, name="StudentReg"),
     #path("404/", views.notfound, name="ERROR404"),
     path("doLogin",views.doLogin, name="doLogin"),

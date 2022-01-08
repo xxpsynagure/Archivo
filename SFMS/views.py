@@ -1,5 +1,5 @@
 from django.db.models.fields import EmailField
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.contrib import messages
 from SFMS import models
@@ -9,8 +9,8 @@ from django.db import connections
 def index(response):
     return HttpResponse('<h1>Student File Management System</h1>')
 
-def StudentLogin(request):
-    return render (request, "StudentLogin.html")
+def Login(request):
+    return render (request, "Login.html")
 
 def StudentReg(request):
     cur = connections['default'].cursor()
@@ -41,13 +41,15 @@ def doLogin(request):
     else:
         user = request.POST.get("your_username")
         password = request.POST.get("your_pass")
+        cur = connections['default'].cursor()
         p = models.Registration.objects.raw(f"SELECT * FROM Registration WHERE Username = '{user}' AND  Pass = md5('{password}');")
 
         if(p):
+            messages.success(request, "Login successful")
             return HttpResponse("<h2>Login Successful</h2>")
         else:
-            messages.info(request,'Username or Password is incorrect!')
-            return render(request,"StudentLogin.html")
+            messages.error(request, "Username or Password not matching, Please try again")
+            return redirect('Login')
 
 def doReg(request):
     if(request.method!='POST'):

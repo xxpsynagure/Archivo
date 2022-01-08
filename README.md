@@ -9,3 +9,4 @@
 * create virtual environment venv - `pip install virtualenv`  `virtualenv [directory]` 
 * use for this project (I do always)
 * and pip install django and mysqlclient (requirements.txt) in the venv
+* to load all static files do `python manage.py runserver --insecure` with `debug=False` in settings.py
