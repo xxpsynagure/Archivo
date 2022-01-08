@@ -9,11 +9,13 @@
 
     <!-- Font Icon -->
     <link rel="stylesheet" href="{% static 'fonts/material-icon/css/material-design-iconic-font.min.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
     <!-- Main css -->
     <link rel="stylesheet" href="{%static 'css/style.css' %}">
     <link rel="stylesheet" href="{%static 'css/style.css.map' %}">
 </head>
+
 <body>
 
     <div class="main">
@@ -25,12 +27,7 @@
                     <div class="signup-form">
                         <h2 class="form-title">Sign up</h2>
                         <form action="/doReg" method="POST" class="register-form" id="register-form">{%csrf_token%}
-                            <!--
-                            <div class="form-group">
-                                <label for="name"><i class="zmdi zmdi-account material-icons-name"></i></label>
-                                <input type="text" name="name" id="name" placeholder="Your Name"/>
-                            </div>
-                            -->
+                            
                             <div class="form-group">
                                 <label for="username"><i class="zmdi zmdi-account material-icons-name"></i></label>
                                 <input type="text" name="username" id="username" placeholder="Your Username"/>
@@ -43,29 +40,47 @@
                                 <label for="email"><i class="zmdi zmdi-email"></i></label>
                                 <input type="email" name="email" id="email" placeholder="Your Email"/>
                             </div>
-
-                            <div class="form-group">
-                                <label for="college">Choose your College:</label><br><br>
-                                
-                                <select name="college" id="college">
-                                <option value="first" disabled selected>Select your option</option>
-                                <option value="SJEC">St Joseph Engineering College</option>
-                                <option value="SCEM">Sahyadri College of Engineering and Management</option>
-                            </select>
+               
+                            <div class="form-group">        
+                                    <select class="form-control" id="college" name ="college">
+                                        <option value="" disabled selected>Choose your college</option>
+                                        {% for key,value in params.items %}  
+                                            <option value="{{key}}">{{value}}</option>
+                                        {% endfor %} 
+                                    </select>
+                                    
                             </div>
-
+                            
                             <div class="form-group">
-                                <label for="branch">Choose your Branch:</label><br><br>
-                                
-                                <select name="branch" id="branch">
-                                <option value="" disabled selected>Select your option</option>
-                                <option value="CSE">Computer Science and Engineering</option>
-                                <option value="MECH">Mechanical Engineering</option>
-                                <option value="EC">Electronics and Communication Engineering</option>
-                                <option value="CIV">Civil Engineering</option>
-                                </select>
-                            </div>
+                                    
+                                    <select class="form-control" id="branch" name ="branch">
+                                        <option value="" disabled selected>Choose your branch</option>
+                                        {% for key,value in branch.items %}  
+                                            <option value="{{key}}">{{value}}</option>
+                                        {% endfor %} 
+                                    </select>
 
+                            </div>
+                            
+                            
+
+                                <!-- <div class="form-button">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true">
+                                      Choose your College
+                                    </button>
+                                    <ul class="dropdown-menu" >
+                                        {% for key,value in params.items %}
+                                      <li style="height:30px;overflow:hidden;"><a class="dropdown-item" value={{key}}>{{value}}</a></li>
+                                      {%endfor%}
+                                    </ul>
+                                  </div>
+                                </div>  -->
+
+                                
+                
+        
+                            
                             <div class="form-group">
                                 <label for="pass"><i class="zmdi zmdi-lock"></i></label>
                                 <input type="password" name="pass" id="pass" placeholder="Password"/>
@@ -94,8 +109,13 @@
     </div>
 
     
-    <script src="{% static '/vendor/jquery/.min.js'         %}"</script>
-    <script src="{% static '/js/main.js'         %}"</script>
+    <script type="text/javascript" src="{% static '/vendor/jquery/jquery-ui.min.js'         %}"></script>
+    <script type="text/javascript" src="{% static '/vendor/jquery/jquery.min.js'         %}"></script>
+    <script type="text/javascript" src="{% static '/js/main.js'         %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
+    
+
+    </div>
 </body>
 </html>   

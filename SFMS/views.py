@@ -13,7 +13,24 @@ def StudentLogin(request):
     return render (request, "StudentLogin.html")
 
 def StudentReg(request):
-    return render(request, "StudentReg.html")
+    cur = connections['default'].cursor()
+    cur.execute(f"SELECT * FROM College ")
+    params ={}
+    for item in cur:
+        params[item[0]]=item[1]
+    print(params)
+    print()
+    cur.execute(f"SELECT * FROM Branch")
+    branch = {}
+    colli = []
+    for item in cur:
+        branch[item[0]] = item[1]
+        colli.append(item[2])
+
+    print(colli)
+    print(branch)
+    
+    return render(request, 'StudentReg.html', {'params':params}|{'branch':branch}|{'colli':colli})
 
 def error_404(request,exception):
     return render(request, "404.html")
