@@ -6,8 +6,8 @@ from SFMS import models
 from django.db import connections
 
 # Create your views here.
-def index(response):
-    return HttpResponse('<h1>Student File Management System</h1>')
+def index(request):
+    return render(request,"index.html")
 
 def Login(request):
     return render (request, "Login.html")
