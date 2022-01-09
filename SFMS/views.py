@@ -129,7 +129,13 @@ def doReg(request):
                 return redirect(request.META['HTTP_REFERER'][22:])
 
             messages.success(request, "Registration Succesful")
-            return HttpResponse("<h2>Registration Successful</h2>")
+            global USN
+            USN = usn
+            if T_or_S == 'S':
+                return render(request, 'StudentProfile.html', {'username':user, 'usn':usn, 'email':email, 'branch':branch})
+            else:
+                return render(request, 'TeacherProfile.html', {'username':user, 'usn':usn, 'email':email, 'branch':branch})
+                
         else:
             messages.error(request, "Password not matching, Please Try again")
             return redirect(request.META['HTTP_REFERER'][22:])
@@ -144,14 +150,15 @@ def trial(request): #trial purpose
     # p=models.Registration.objects.raw('SELECT * FROM Registration')[0]
     # print(p.username,p.email)
     
-    return render(request, "studentDetails.html")
+    return render(request, "TeacherProfile.html")
 
 def StudentDashboard(request):
     cur = connections['default'].cursor() 
     print(USN)
     cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
-    data = cur.fetchall()
-    return render(request, "StudentDashboard.html",{'username':data[0][0]})
+    data = cur.fetchone()
+    print(data)
+    return render(request, "StudentDashboard.html",{'username':data[0]})
 
 def TeacherDashboard(request): 
     cur = connections['default'].cursor() 
