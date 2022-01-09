@@ -4072,8 +4072,11 @@ textarea.form-control-lg {
 }
 
 .navbar-text {
+  font-size:x-large;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  position: relative;
+  right:80px;
 }
 
 .navbar-collapse {
