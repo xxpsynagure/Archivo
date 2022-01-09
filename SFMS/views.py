@@ -7,6 +7,7 @@ from SFMS import models
 from django.db import connections
 from django.core.exceptions import *
 
+USN =''
 # Create your views here.
 def index(request):
     return render(request,"index.html")
@@ -81,7 +82,10 @@ def doLogin(request):
         if(p):
             messages.success(request, "Login successful")
             data = cur.fetchall()
+            global USN
+            USN=data[0][0]
             if(data[0][6]=='S'):
+                print(USN)
                 return redirect("/StudentDashboard")
             return redirect("TeacherDashboard")
         else:
@@ -142,8 +146,17 @@ def trial(request): #trial purpose
     
     return render(request, "studentDetails.html")
 
-def StudentDashboard(request): 
-    return render(request, "StudentDashboard.html")
+def StudentDashboard(request):
+    cur = connections['default'].cursor() 
+    print(USN)
+    cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
+    data = cur.fetchall()
+    return render(request, "StudentDashboard.html",{'username':data[0][0]})
 
 def TeacherDashboard(request): 
-    return render(request, "TeacherDashboard.html")
+    cur = connections['default'].cursor() 
+    print(USN)
+    cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
+    data = cur.fetchall()
+    return render(request, "TeacherDashboard.html",{'username':data[0][0]})
+    
