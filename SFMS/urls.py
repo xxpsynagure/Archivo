@@ -11,6 +11,7 @@ urlpatterns = [
     path("doLogin",views.doLogin, name="doLogin"),
     path("doReg",views.doReg,name="doReg"),
     path("trial",views.trial),
-    path("rough",views.rough,name="try"),
+    path("StudentDashboard",views.StudentDashboard,name="StudentDashboard"),
+    path("TeacherDashboard",views.TeacherDashboard, name="TeacherDashboard")
 ]
 

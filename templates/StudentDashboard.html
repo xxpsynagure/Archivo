@@ -1,0 +1,133 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<!-- Navbar -->
+<a class="menu-toggle rounded" href="#"><i class="fas fa-user"></i></a>
+<nav id="sidebar-wrapper">
+    <ul class="sidebar-nav ">
+        <li class="sidebar-brand"><a href="#">Archivo</a></li>
+        <li class="sidebar-nav-item"><a href="#">Profile</a></li>
+        <li class="sidebar-nav-item"><a href="#">Notifications</a></li>
+        <!-- <li class="sidebar-nav-item"><a href="#services">Make an announcement</a></li> -->
+        <li class="sidebar-nav-item"><a href="/">Log out</a></li>
+    </ul>
+</nav>
+
+<header class=" bg-primary text-white">
+    <div class="container px-4 px-lg-5 text-center">
+        <div class="container px-4 px-lg-5 text-center">
+            <br>
+            <!-- <h4 style="font-family: cursive;">Welcome to Student Dashboard</h4> -->
+            <h1 class="mb-1" style="font-family: cursive;">Archivo</h1>
+            <h4 class="text-secondary mb-0"><em>A single place to manage all your files</em></h4><br>
+            <!-- <a class="btn btn-primary btn-xl" href="#services">Let's dive in</a> -->
+            <!-- <a class="btn btn-dark btn-xl" href="#services">What We Offer</a> -->
+        </div>
+        <!-- <h2 class="mb-4">The buttons below are impossible to resist...</h2>
+        <a class="btn btn-xl btn-light me-4" href="#!">Click Me!</a>
+        <a class="btn btn-xl btn-dark" href="#!">Look at Me!</a> -->
+    </div>
+</header>
+
+<section id="dashboard">
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-4">
+			<div class="dbox dbox--color-1">
+				<div class="dbox__icon">
+					<i class="glyphicon glyphicon-cloud"></i>
+				</div>
+				<div class="dbox__body">
+					<span class="dbox__count">18CS..</span>
+					<span class="dbox__title">COMPUTER NETWORKS AND SECURITY</span>
+				</div>
+				
+				<div class="dbox__action">
+					<a class="btn dbox__action__btn" href="" >Visit</a>
+				</div>				
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="dbox dbox--color-2">
+				<div class="dbox__icon">
+					<i class="glyphicon glyphicon-download"></i>
+				</div>
+				<div class="dbox__body">
+					<span class="dbox__count">18CS</span>
+					<span class="dbox__title">DATABASE MANAGEMENT SYSTEM</span>
+				</div>
+				
+				<div class="dbox__action">
+					<button class="btn dbox__action__btn" onclick="window.location.href='/'">Visit</button>
+				</div>				
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="dbox dbox--color-3">
+				<div class="dbox__icon">
+					<i class="glyphicon glyphicon-heart"></i>
+				</div>
+				<div class="dbox__body">
+					<span class="dbox__count">2502</span>
+					<span class="dbox__title">Enrichment Content</span>
+				</div>
+				
+				<div class="dbox__action">
+					<button class="dbox__action__btn">More Info</button>
+				</div>				
+			</div>
+		</div>
+	</div>
+
+    <div class="row">
+		<div class="col-md-4">
+			<div class="dbox dbox--color-1">
+				<div class="dbox__icon">
+					<i class="glyphicon glyphicon-cloud"></i>
+				</div>
+				<div class="dbox__body">
+					<span class="dbox__count">8,252</span>
+					<span class="dbox__title">Lesson Plan</span>
+				</div>
+				
+				<div class="dbox__action">
+					<button class="dbox__action__btn">More Info</button>
+				</div>				
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="dbox dbox--color-2">
+				<div class="dbox__icon">
+					<i class="glyphicon glyphicon-download"></i>
+				</div>
+				<div class="dbox__body">
+					<span class="dbox__count">100</span>
+					<span class="dbox__title">Learning Resources</span>
+				</div>
+				
+				<div class="dbox__action">
+					<button class="dbox__action__btn">More Info</button>
+				</div>				
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="dbox dbox--color-3">
+				<div class="dbox__icon">
+					<i class="glyphicon glyphicon-heart"></i>
+				</div>
+				<div class="dbox__body">
+					<span class="dbox__count">2502</span>
+					<span class="dbox__title">Enrichment Content</span>
+				</div>
+				
+				<div class="dbox__action">
+					<button class="dbox__action__btn">More Info</button>
+				</div>				
+			</div>
+		</div>
+</div>
+</section>
+
+
+{% endblock %}

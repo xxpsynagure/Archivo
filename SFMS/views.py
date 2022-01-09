@@ -80,7 +80,10 @@ def doLogin(request):
 
         if(p):
             messages.success(request, "Login successful")
-            return HttpResponse("<h2>Login Successful</h2>")
+            data = cur.fetchall()
+            if(data[0][6]=='S'):
+                return redirect("/StudentDashboard")
+            return redirect("TeacherDashboard")
         else:
             messages.error(request, "Username or Password not matching, Please try again")
             return redirect('Login')
@@ -139,5 +142,8 @@ def trial(request): #trial purpose
     
     return render(request, "studentDetails.html")
 
-def rough(request): 
-    return render(request, "student.html")
+def StudentDashboard(request): 
+    return render(request, "StudentDashboard.html")
+
+def TeacherDashboard(request): 
+    return render(request, "TeacherDashboard.html")
