@@ -11,5 +11,6 @@ urlpatterns = [
     path("doLogin",views.doLogin, name="doLogin"),
     path("doReg",views.doReg,name="doReg"),
     path("trial",views.trial),
+    path("rough",views.rough,name="try"),
 ]
 

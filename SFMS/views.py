@@ -138,3 +138,6 @@ def trial(request): #trial purpose
     # print(p.username,p.email)
     
     return render(request, "studentDetails.html")
+
+def rough(request): 
+    return render(request, "student.html")
