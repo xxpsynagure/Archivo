@@ -12,6 +12,8 @@ urlpatterns = [
     path("doReg",views.doReg,name="doReg"),
     path("trial",views.trial),
     path("StudentDashboard",views.StudentDashboard,name="StudentDashboard"),
-    path("TeacherDashboard",views.TeacherDashboard, name="TeacherDashboard")
+    path("TeacherDashboard",views.TeacherDashboard, name="TeacherDashboard"),
+    path("StudentDashboard/StudentProfile", views.StudentProfile, name="StudentProfile"),
+    path("TeacherDashboard/TeacherProfile", views.TeacherProfile, name="TeacherProfile"),
 ]
 

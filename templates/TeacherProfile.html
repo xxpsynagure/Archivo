@@ -1,3 +1,4 @@
+{% extends 'base.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -11,12 +12,13 @@
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
+{% block content %}
 <body>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 <div class="container bootstrap snippets bootdeys">
 <div class="row">
-  <div class="col-xs-12 col-sm-9">
-    <form class="form-horizontal" action="/TeacherDashboard" method="post">{%csrf_token%}
+  <div class="col-xs-10 col-sm-10">
+    <form class="form-horizontal" action="" method="post">{%csrf_token%}
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">Hello {{ username }}</h4>
@@ -34,34 +36,34 @@
           <div class="form-group">
             <label class="col-sm-2 control-label"> SSID </label>
             <div class="col-sm-10">
-            <input type="text" class="form-control" value={{ usn }} readonly>
+            <input type="text" class="form-control" id="ssid" value={{ usn }} readonly>
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label"> First Name</label>
             <div class="col-sm-4">
-              <input type="text" class="form-control">
+              <input type="text" class="form-control" id="Fname">
             </div>
             <label class="col-sm-2 control-label"> Last Name </label>
             <div class="col-sm-4">
-              <input type="text" class="form-control">
+              <input type="text" class="form-control" id="Lname">
             </div>
           </div>
 
           <div class="form-group"> 
             <label class="col-sm-2 control-label"> Designation </label>
             <div class="col-sm-3">
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" id="Designation">
             </div>
             <label class="col-sm-2 control-label">Department</label>
             <div class="col-sm-5">
-              <input type="text" class="form-control" readonly value={{branch}}>
+              <input type="text" class="form-control" id="Department" readonly value={{branch}}>
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Year of Experience </label>
             <div class="col-sm-4">
-              <input type="number" class="form-control">
+              <input type="number" class="form-control" id="yr_of_exp">
               </select>
             </div>
           </div>
@@ -76,19 +78,19 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">Email</label>
             <div class="col-sm-10">
-              <input type="email" class="form-control" value={{email}}>
+              <input type="email" class="form-control" id="Email" value={{email}}>
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Mobile number</label>
             <div class="col-sm-10">
-              <input type="tel" class="form-control" placeholder="(+91)">
+              <input type="tel" class="form-control" placeholder="(+91)" id="Phno">
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Skills</label>
             <div class="col-sm-10">
-              <textarea rows="3" class="form-control" placeholder="Please mention your skills and Industry experience"></textarea>
+              <textarea rows="3" class="form-control" placeholder="Please mention your skills and Industry experience" id="Skills"></textarea>
             </div>
           </div>
         </div>
@@ -102,14 +104,14 @@
           <div class="form-group">
             <label class="col-sm-3 control-label">Upload your recent image: </label>
             <div class="col-sm-4">
-              <input type="file" accept=".jpg , .jpeg , .png">
+              <input type="file" accept=".jpg , .jpeg , .png" id="Image">
             </div>
           </div>
           <br><br>
           <div class="form-group">
             <div class="col-sm-10 col-sm-offset-5">
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <button type="reset" class="btn btn-default">Cancel</button>
+              <button type="submit" class="btn">Submit</button>
+              <!-- <button type="reset" class="btn">Cancel</button> -->
             </div>
           </div>
         </div>
@@ -123,8 +125,15 @@
 
 body{
     margin-top:20px;
-    background:#f5f5f5;
+    background:#1D809F;
 }
+.row {
+    align-items: center;
+}
+.control-label {
+    color: black;
+}
+
 /**
  * Panels
  */
@@ -151,8 +160,12 @@ body{
 
 .panel-default > .panel-heading {
     color: #333333;
-    background-color: transparent;
+    background-color: #999999;
     border-color: rgba(0, 0, 0, 0.07);
+}
+
+.panel-default {
+    background-color: white;
 }
 
 form label {
@@ -189,10 +202,28 @@ form label {
   margin-top: 196px;
   border: 4px solid #09b7ce;
 }
+.btn {
+  margin-top: 1rem;
+  display: inline-block;
+  font-size: 1.2rem;
+  color: #fff;
+  background-color: black;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s linear;
+}
+.btn:hover {
+  transform: translateY(-0.2em);
+  background-color: #1D809F;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px;
+  /* box-shadow: violet 0px 5px 15px; */
+}
 </style>
 
 <script type="text/javascript">
 
 </script>
 </body>
+{% endblock %}
 </html>

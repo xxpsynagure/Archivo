@@ -104,10 +104,7 @@ def doReg(request):
             branch =request.POST.get("branch")
             passw = request.POST.get("pass")
             re_pass =request.POST.get("re_pass")       
-            if (request.META['HTTP_REFERER'][22:]) == 'TeacherReg/':
-                T_or_S = 'T'
-            else:
-                T_or_S = 'S'
+            T_or_S = 'T' if (request.META['HTTP_REFERER'][22:]) == 'TeacherReg/' else 'S'
         except ObjectDoesNotExist as e:
             print(e)
             messages.warning(request, "Form not filled, \n Please check again")
@@ -132,9 +129,9 @@ def doReg(request):
             global USN
             USN = usn
             if T_or_S == 'S':
-                return render(request, 'StudentProfile.html', {'username':user, 'usn':usn, 'email':email, 'branch':branch})
+                return redirect('StudentProfile')
             else:
-                return render(request, 'TeacherProfile.html', {'username':user, 'usn':usn, 'email':email, 'branch':branch})
+                return redirect('TeacherProfile')
                 
         else:
             messages.error(request, "Password not matching, Please Try again")
@@ -153,6 +150,9 @@ def trial(request): #trial purpose
     return render(request, "TeacherProfile.html")
 
 def StudentDashboard(request):
+    if request.method != 'POST':
+        return HttpResponse("Method not allowed")
+
     cur = connections['default'].cursor() 
     print(USN)
     cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
@@ -167,3 +167,37 @@ def TeacherDashboard(request):
     data = cur.fetchall()
     return render(request, "TeacherDashboard.html",{'username':data[0][0]})
     
+def StudentProfile(request):
+    return render(request, 'StudentProfile.html')
+
+def TeacherProfile(request):
+    if(request.method!='POST'):
+        return render(request, 'TeacherProfile.html')
+    try:
+        ssid = request.POST.get("ssid")
+        Fname = request.POST.get("Fname")
+        Lname = request.POST.get("Lname")
+        Designation = request.POST.get("Department")
+        Department = request.POST.get("Department")
+        yr_of_exp = request.POST.get("yr_of_exp")
+        Email = request.POST.get("Email")
+        Phno = request.POST.get("Phno")
+        Skills = request.POST.get("Skills")
+        Image = request.POST.get("Image")
+    except ObjectDoesNotExist as e:
+        print(e)
+        messages.warning(request, "Form not filled, \n Please check again")
+        return redirect('#')    
+
+    try:
+        cursor = connections['default'].cursor()
+    except DatabaseError as e:
+        print(e)
+        messages.warning(request, "Cannot connect to Database \n Please try again later")
+        return redirect('/#Error')
+    try:
+        cursor.execute(f"INSERT INTO Teacher VALUES('{ssid}','{Fname}','{Lname}',{Designation}','{Department}','{yr_of_exp}', '{Email}', '{Phno}', '{Skills}', '{Image}');")
+    except IntegrityError as e:
+        print(e)
+
+    return render(request, 'TeacherProfile.html')
