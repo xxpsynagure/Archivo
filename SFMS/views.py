@@ -21,8 +21,7 @@ def StudentReg(request):
         params ={}
         for item in cur:
             params[item[0]]=item[1]
-        print(params)
-        print()
+
         cur.execute(f"SELECT * FROM Branch")
         branch = {}
         colli = []
@@ -33,7 +32,7 @@ def StudentReg(request):
         return render(request, 'StudentReg.html', {'params':params}|{'branch':branch}|{'colli':colli})
     except DatabaseError or DataError as e:
         print(e.args)
-        messages.warning(request, e.args)
+        messages.warning(request, "Cannot connect to Database \n Please Try again later")
         return redirect('/#Error')
 
 def TeacherReg(request):
@@ -53,7 +52,7 @@ def TeacherReg(request):
         return render(request, 'TeacherReg.html', {'params':params}|{'branch':branch}|{'colli':colli})
     except DatabaseError or DataError as e:
         print(e.args)
-        messages.warning(request, e.args)
+        messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('/#Error')
 
 
@@ -76,7 +75,7 @@ def doLogin(request):
             p = cur.execute(f"SELECT * FROM Registration WHERE Username = '{user}' AND  Pass = md5('{password}');")
         except DatabaseError or DataError as e:
             print(e)
-            messages.warning(request, e.args)
+            messages.warning(request, "Cannot connect to Database, \n Please try again later")
             return redirect('Login')
 
         if(p):
@@ -104,7 +103,7 @@ def doReg(request):
                 T_or_S = 'S'
         except ObjectDoesNotExist as e:
             print(e)
-            messages.warning(request, e.args)
+            messages.warning(request, "Form not filled, \n Please check again")
             return redirect('/#Error')
 
         if(passw==re_pass):
@@ -112,13 +111,14 @@ def doReg(request):
                 cursor = connections['default'].cursor()
             except DatabaseError as e:
                 print(e)
-                messages.warning(request, e)
+                messages.warning(request, "Cannot connect to Database \n Please try again later")
                 return redirect('/#Error')
             try:
                 cursor.execute(f"INSERT INTO Registration VALUES('{usn}','{user}','{email}',md5('{passw}'),'{branch}','{college}', '{T_or_S}');")
             except IntegrityError as e:
                 print(e)
-                messages.warning(request, e.args)
+                refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Please fill in details"}
+                messages.warning(request, refer[str(e.args).split('.')[-1][:-3]])
                 return redirect(request.META['HTTP_REFERER'][22:])
 
             messages.success(request, "Registration Succesful")
@@ -130,11 +130,11 @@ def doReg(request):
 
 
 def trial(request): #trial purpose
-    posts = models.Registration.objects.all()
-    print(posts)
-    print(posts.query)
+    # posts = models.Registration.objects.all()
+    # print(posts)
+    # print(posts.query)
 
-    p=models.Registration.objects.raw('SELECT * FROM Registration')[0]
-    print(p.username,p.email)
+    # p=models.Registration.objects.raw('SELECT * FROM Registration')[0]
+    # print(p.username,p.email)
     
-    return HttpResponse("hello")
+    return render(request, "studentDetails.html")

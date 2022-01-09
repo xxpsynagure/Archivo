@@ -26,6 +26,12 @@
                 <div class="signup-content">
                     <div class="signup-form">
                         <h2 class="form-title">Sign up</h2>
+                        {% if messages %}
+                                {% for message in messages %}
+                                    <div>{{ message }}</div>
+                                    <br>
+                                {% endfor %}
+                            {% endif %} 
                         <form action="/doReg" method="POST" class="register-form" id="register-form">{%csrf_token%}
                             
                             <div class="form-group">
@@ -90,12 +96,7 @@
                                 <input type="password" name="re_pass" id="re_pass" placeholder="Repeat your password"/>
                             </div><br>
                             
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <div>{{message}}</div>
-                                    <br>
-                                {% endfor %}
-                            {% endif %} 
+                            
 
                             <div class="form-group">
                                 <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" />
