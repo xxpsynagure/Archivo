@@ -1,229 +1,66 @@
 {% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <!--  This file has been downloaded from bootdey.com @bootdey on twitter -->
-    <!--  All snippets are MIT license http://bootdey.com/license -->
-    <title>Profile page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	<script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=G7lnnK620mUpj5bEmI94Dm_0n3WL68GEKyDR-ormeXfs9wdq7nPgzFvhTYZ8NpfT40v3wsO4uN0cW_z_2EQjnAteFcMB9R5ZCL39PZzLD9g" charset="UTF-8"></script><script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-	<script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-</head>
+
+
+
 {% block content %}
-<body>
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-<div class="container bootstrap snippets bootdeys">
-<div class="row">
-  <div class="col-xs-10 col-sm-10">
-    <form class="form-horizontal" action="" method="post">{%csrf_token%}
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">Hello {{ username }}</h4>
-          </div>
-          <div class="panel-body text-center">
-            <!-- <i class="fa fa-user" aria-hidden="true" font-size="25px"></i> -->
-           <img src="{% static 'assets/images/user.png' %}" class="img-circle profile-avatar" alt="User avatar">
-          </div>
-        </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-        <h4 class="panel-title">User info</h4>
-        </div>
-        <div class="panel-body">
-          <div class="form-group">
-            <label class="col-sm-2 control-label"> SSID </label>
-            <div class="col-sm-10">
-            <input type="text" class="form-control" id="ssid" value={{ usn }} readonly>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label"> First Name</label>
-            <div class="col-sm-4">
-              <input type="text" class="form-control" id="Fname">
-            </div>
-            <label class="col-sm-2 control-label"> Last Name </label>
-            <div class="col-sm-4">
-              <input type="text" class="form-control" id="Lname">
-            </div>
-          </div>
-
-          <div class="form-group"> 
-            <label class="col-sm-2 control-label"> Designation </label>
-            <div class="col-sm-3">
-                <input type="text" class="form-control" id="Designation">
-            </div>
-            <label class="col-sm-2 control-label">Department</label>
-            <div class="col-sm-5">
-              <input type="text" class="form-control" id="Department" readonly value={{branch}}>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">Year of Experience </label>
-            <div class="col-sm-4">
-              <input type="number" class="form-control" id="yr_of_exp">
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel panel-default">
-        <div class="panel-heading">
-        <h4 class="panel-title">Contact info</h4>
-        </div>
-        <div class="panel-body">
-          <div class="form-group">
-            <label class="col-sm-2 control-label">Email</label>
-            <div class="col-sm-10">
-              <input type="email" class="form-control" id="Email" value={{email}}>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">Mobile number</label>
-            <div class="col-sm-10">
-              <input type="tel" class="form-control" placeholder="(+91)" id="Phno">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">Skills</label>
-            <div class="col-sm-10">
-              <textarea rows="3" class="form-control" placeholder="Please mention your skills and Industry experience" id="Skills"></textarea>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel panel-default">
-        <div class="panel-heading">
-        <h4 class="panel-title">Acknowledge</h4>
-        </div>
-        <div class="panel-body">
-          <div class="form-group">
-            <label class="col-sm-3 control-label">Upload your recent image: </label>
-            <div class="col-sm-4">
-              <input type="file" accept=".jpg , .jpeg , .png" id="Image">
-            </div>
-          </div>
-          <br><br>
-          <div class="form-group">
-            <div class="col-sm-10 col-sm-offset-5">
-              <button type="submit" class="btn">Submit</button>
-              <!-- <button type="reset" class="btn">Cancel</button> -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
+<br>
+<div class="center">
+  <h1>Profile</h1>
+  {% if messages %}
+      {% for message in messages %}
+          <div>{{ message }}</div>
+          <br>
+      {% endfor %}
+  {% endif %}
+  <form action="#" method="post" class="form">{%csrf_token%}
+    <div class="inputbox">
+      <input type="text" required="required" name="ssid" >
+      <span>SSID</span>
+    </div>
+    <div class="inputbox">
+      <input type="text" required="required" name="Fname">
+      <span>Fname</span>
+    </div>
+    <div class="inputbox">
+      <input type="text" required="required" name="Lname">
+      <span>Lname</span>
+    </div>
+    <div class="inputbox">
+      <input type="text" required="required" name="Designation">
+      <span>Designation</span>
+    </div>
+    <div class="inputbox">
+      <input type="text" required="required" name="Department" >
+      <span>Department</span>
+    </div>
+    <div class="inputbox">
+      <input type="number" required="required" name="yr_of_exp">
+      <span>Year of Experience</span>
+    </div>
+    <div class="inputbox">
+      <input type="email" required="required" name="Email" >
+      <span>Email</span>
+    </div>
+    <div class="inputbox">
+      <input type="tel" required="required" name="Phno">
+      <span>Mobile number</span>
+    </div>
+    <div class="inputbox">
+      <textarea name="Skills" id="" cols="30" rows="3" placeholder="Skills"></textarea>
+      <span></span>
+    </div>
+    <br><br>
+    <div class="inputbox">
+      <input type="file" name="Image" accept=".jpg, .jpeg, .png">
+      <span>Chose your recent image</span>
+    </div>
+    <div class="inputbox">
+      <!-- <input type="button" value="submit" name="submit"> -->
+      <button type="submit" class="btn">Submit</button>
+    </div>
+  </form>
 </div>
-</div>
-
-<style type="text/css">
-
-body{
-    margin-top:20px;
-    background:#1D809F;
-}
-.row {
-    align-items: center;
-}
-.control-label {
-    color: black;
-}
-
-/**
- * Panels
- */
-/*** General styles ***/
-.panel {
-  box-shadow: none;
-}
-.panel-heading {
-  border-bottom: 0;
-}
-.panel-title {
-  font-size: 17px;
-}
-.panel-title > small {
-  font-size: .75em;
-  color: #999999;
-}
-.panel-body *:first-child {
-  margin-top: 0;
-}
-.panel-footer {
-  border-top: 0;
-}
-
-.panel-default > .panel-heading {
-    color: #333333;
-    background-color: #999999;
-    border-color: rgba(0, 0, 0, 0.07);
-}
-
-.panel-default {
-    background-color: white;
-}
-
-form label {
-    color: #999999;
-    font-weight: 400;
-}
-
-.form-horizontal .form-group {
-  margin-left: -15px;
-  margin-right: -15px;
-}
-@media (min-width: 768px) {
-  .form-horizontal .control-label {
-    text-align: right;
-    margin-bottom: 0;
-    padding-top: 7px;
-  }
-}
-
-.profile__contact-info-icon {
-    float: left;
-    font-size: 18px;
-    color: #999999;
-}
-.profile__contact-info-body {
-    overflow: hidden;
-    padding-left: 20px;
-    color: #999999;
-}
-.profile-avatar {
-  width: 200px;
-  position: relative;
-  margin: 0px auto;
-  margin-top: 196px;
-  border: 4px solid #09b7ce;
-}
-.btn {
-  margin-top: 1rem;
-  display: inline-block;
-  font-size: 1.2rem;
-  color: #fff;
-  background-color: black;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  transition: all 0.2s linear;
-}
-.btn:hover {
-  transform: translateY(-0.2em);
-  background-color: #1D809F;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px;
-  /* box-shadow: violet 0px 5px 15px; */
-}
-</style>
-
-<script type="text/javascript">
-
-</script>
-</body>
 {% endblock %}
-</html>
+
+

@@ -147,7 +147,7 @@ def trial(request): #trial purpose
     # p=models.Registration.objects.raw('SELECT * FROM Registration')[0]
     # print(p.username,p.email)
     
-    return render(request, "TeacherProfile.html")
+    return render(request, "StudentProfile.html")
 
 def StudentDashboard(request):
 
@@ -164,9 +164,45 @@ def TeacherDashboard(request):
     cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
     data = cur.fetchall()
     return render(request, "TeacherDashboard.html",{'username':data[0][0]})
-    
+
+
 def StudentProfile(request):
+    if(request.method!='POST'):
+        return render(request, 'StudentProfile.html')
+    try:
+        usn = request.POST.get("usn")
+        Fname = request.POST.get("Fname")
+        Lname = request.POST.get("Lname")
+        Branch= request.POST.get("Branch")
+        Sem = request.POST.get("Sem")
+        Sec = request.POST.get("Sec")
+        DOB = request.POST.get("DOB")
+        Email = request.POST.get("Email")
+        Phno = request.POST.get("Phno")
+        Portfolio_links = request.POST.get("Portfolio_links")
+        About = request.POST.get("About")
+        Image = request.POST.get("Image")
+    except ObjectDoesNotExist as e:
+        print(e)
+        messages.warning(request, "Form not filled, \n Please check again")
+        return redirect('#')    
+    
+    print(usn, Fname, Lname, Branch, Sem, Sec, DOB, Email, Phno, Portfolio_links, About)
+
+    try:
+        cursor = connections['default'].cursor()
+    except DatabaseError as e:
+        print(e)
+        messages.warning(request, "Cannot connect to Database \n Please try again later")
+        return redirect('/#Error')
+    try:
+        cursor.execute(f"INSERT INTO Student VALUES('{usn}','{Fname}','{Lname}','{Branch}','{Sem}','{Sec}','{DOB}', '{Email}', '{Phno}', '{Image}', '{Portfolio_links}', '{About}');")
+    except IntegrityError as e:
+        print(e)
+        
+    messages.success(request, "Registration sucessful")
     return render(request, 'StudentProfile.html')
+
 
 def TeacherProfile(request):
     if(request.method!='POST'):
@@ -186,6 +222,8 @@ def TeacherProfile(request):
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')    
+    
+    print(ssid, Fname, Lname, Department, Designation, yr_of_exp, Email, Skills)
 
     try:
         cursor = connections['default'].cursor()
@@ -194,8 +232,8 @@ def TeacherProfile(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('/#Error')
     try:
-        cursor.execute(f"INSERT INTO Teacher VALUES('{ssid}','{Fname}','{Lname}',{Designation}','{Department}','{yr_of_exp}', '{Email}', '{Phno}', '{Skills}', '{Image}');")
+        cursor.execute(f"INSERT INTO Teacher VALUES('{ssid}','{Fname}','{Lname}','{Designation}','{Department}','{yr_of_exp}', '{Email}', '{Phno}', '{Skills}', '{Image}');")
     except IntegrityError as e:
         print(e)
-
+    messages.success(request, "Registration sucessful")
     return render(request, 'TeacherProfile.html')
