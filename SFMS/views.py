@@ -156,15 +156,15 @@ def trial(request): #trial purpose
     return render(request, "StudentProfile.html")
 
 def StudentDashboard(request):
-    return render(request, "StudentDashboard.html",{'username':greeting()})
+    return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
 
 def TeacherDashboard(request): 
-    return render(request, "TeacherDashboard.html",{'username':greeting()})
+    return render(request, "TeacherDashboard.html",{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
 
 
 def StudentProfile(request):
     if(request.method!='POST'):
-        return render(request, 'StudentProfile.html',{'username':greeting()})
+        return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
     try:
         usn = request.POST.get("usn")
         Fname = request.POST.get("Fname")
@@ -197,12 +197,12 @@ def StudentProfile(request):
         print(e)
 
         messages.error(request,e)
-        return render(request, 'StudentProfile.html',{'username':greeting()})
+        return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
 
 
 def TeacherProfile(request):
     if(request.method!='POST'):
-        return render(request, 'TeacherProfile.html',{'username':greeting()})
+        return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
     try:
         ssid = request.POST.get("ssid")
         Fname = request.POST.get("Fname")
@@ -232,4 +232,4 @@ def TeacherProfile(request):
     except IntegrityError as e:
         print(e)
     messages.success(request, "Registration sucessful")
-    return render(request, 'TeacherProfile.html',{'username':greeting()})
+    return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
