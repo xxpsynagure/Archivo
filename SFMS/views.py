@@ -159,7 +159,16 @@ def StudentDashboard(request):
     return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
 
 def TeacherDashboard(request): 
-    return render(request, "TeacherDashboard.html",{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
+    cur=connections['default'].cursor()
+    cur.execute(f"SELECT C.Branch, C.Sem, C.Sec, S.Subject_code, S.Subject_name FROM Subject S, Class C WHERE ssid = '{USN}' AND S.Class = C.Class")
+    
+    data ={}
+    for item in cur:
+        name = item[0] + '-'+ str(item[1]) + '' + item[2]
+        data[name]=item[4]
+        
+    print(data)
+    return render(request, "TeacherDashboard.html",{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'}|{'subject':data})
 
 
 def StudentProfile(request):
