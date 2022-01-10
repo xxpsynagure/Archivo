@@ -128,6 +128,7 @@ def doReg(request):
             messages.success(request, "Registration Succesful")
             global USN
             USN = usn
+            print(USN)
             if T_or_S == 'S':
                 return redirect('StudentProfile')
             else:
@@ -137,7 +138,12 @@ def doReg(request):
             messages.error(request, "Password not matching, Please Try again")
             return redirect(request.META['HTTP_REFERER'][22:])
 
-
+def greeting():
+    cur = connections['default'].cursor() 
+    print(USN)
+    cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
+    data = cur.fetchone()
+    return data[0]
 
 def trial(request): #trial purpose
     # posts = models.Registration.objects.all()
@@ -150,25 +156,15 @@ def trial(request): #trial purpose
     return render(request, "StudentProfile.html")
 
 def StudentDashboard(request):
-
-    cur = connections['default'].cursor() 
-    print(USN)
-    cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
-    data = cur.fetchone()
-    print(data)
-    return render(request, "StudentDashboard.html",{'username':data[0]})
+    return render(request, "StudentDashboard.html",{'username':greeting()})
 
 def TeacherDashboard(request): 
-    cur = connections['default'].cursor() 
-    print(USN)
-    cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
-    data = cur.fetchall()
-    return render(request, "TeacherDashboard.html",{'username':data[0][0]})
+    return render(request, "TeacherDashboard.html",{'username':greeting()})
 
 
 def StudentProfile(request):
     if(request.method!='POST'):
-        return render(request, 'StudentProfile.html')
+        return render(request, 'StudentProfile.html',{'username':greeting()})
     try:
         usn = request.POST.get("usn")
         Fname = request.POST.get("Fname")
@@ -201,12 +197,13 @@ def StudentProfile(request):
         print(e)
         
     messages.success(request, "Registration sucessful")
-    return render(request, 'StudentProfile.html')
+    print(greeting())
+    return render(request, 'StudentProfile.html',{'username':greeting()})
 
 
 def TeacherProfile(request):
     if(request.method!='POST'):
-        return render(request, 'TeacherProfile.html')
+        return render(request, 'TeacherProfile.html',{'username':greeting()})
     try:
         ssid = request.POST.get("ssid")
         Fname = request.POST.get("Fname")
@@ -236,4 +233,4 @@ def TeacherProfile(request):
     except IntegrityError as e:
         print(e)
     messages.success(request, "Registration sucessful")
-    return render(request, 'TeacherProfile.html')
+    return render(request, 'TeacherProfile.html',{'username':greeting()})
