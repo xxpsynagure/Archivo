@@ -199,9 +199,8 @@ def StudentProfile(request):
         cursor.execute(f"INSERT INTO Student VALUES('{usn}','{Fname}','{Lname}','{Branch}','{Sem}','{Sec}','{DOB}', '{Email}', '{Phno}', '{Image}', '{Portfolio_links}', '{About}');")
     except IntegrityError as e:
         print(e)
-        
-    messages.success(request, "Registration sucessful")
-    return render(request, 'StudentProfile.html')
+        messages.error(request,e)
+        return render(request, 'StudentProfile.html')
 
 
 def TeacherProfile(request):
@@ -235,5 +234,5 @@ def TeacherProfile(request):
         cursor.execute(f"INSERT INTO Teacher VALUES('{ssid}','{Fname}','{Lname}','{Designation}','{Department}','{yr_of_exp}', '{Email}', '{Phno}', '{Skills}', '{Image}');")
     except IntegrityError as e:
         print(e)
-    messages.success(request, "Registration sucessful")
-    return render(request, 'TeacherProfile.html')
+        messages.success(request, "Registration sucessful")
+        return render(request, 'TeacherProfile.html')

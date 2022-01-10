@@ -31,12 +31,17 @@
       <span>Branch</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Sem" >
+      <input type="number" required="required" name="Sem" >
       <span>Semester</span>
     </div>
     <div class="inputbox">
-      <input type="number" required="required" name="Sec">
+      <input type="text" required="required" name="Sec" pattern="A|B|C" >
       <span>Section</span>
+      <!-- <select name="Sec" id="Sec">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select> -->
     </div>
     <div class="inputbox">
       <input type="date" required="required" name="DOB" onfocus="(this.type='date')" onblur="">
@@ -51,7 +56,7 @@
       <span>Mobile number</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Portfolio_links">
+      <input type="text"  name="Portfolio_links" pattern="[A-Za-z0-9:/]*">
       <span>Portfolio links</span>
     </div>
     <div class="inputbox">
