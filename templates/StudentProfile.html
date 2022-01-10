@@ -31,11 +31,11 @@
       <span>Branch</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Sem" value="{{Sem}}">
+      <input type="number" required="required" name="Sem" value="{{Sem}}">
       <span>Semester</span>
     </div>
     <div class="inputbox">
-      <input type="number" required="required" name="Sec" value="{{Sec}}">
+      <input type="text" required="required" name="Sec" value="{{Sec}}" pattern="[ABC]+">
       <span>Section</span>
     </div>
     <div class="inputbox">
@@ -51,7 +51,7 @@
       <span>Mobile number</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Portfolio_links" value="{{Portfolio_links}}">
+      <input type="text" required="required" name="Portfolio_links" value="{{Portfolio_links}}" pattern="[A-Za-z0-9:/ ,]*">
       <span>Portfolio links</span>
     </div>
     <div class="inputbox">
