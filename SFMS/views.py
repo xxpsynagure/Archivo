@@ -141,7 +141,7 @@ def doReg(request):
 def greeting():
     cur = connections['default'].cursor() 
     print(USN)
-    cur.execute(f"SELECT Username FROM Registration WHERE usn_ssid = '{USN}'")
+    cur.execute(f"CALL greetings('{USN}')")
     data = cur.fetchone()
     return data[0]
 
@@ -153,7 +153,7 @@ def trial(request): #trial purpose
     # p=models.Registration.objects.raw('SELECT * FROM Registration')[0]
     # print(p.username,p.email)
     
-    return render(request, "StudentProfile.html")
+    return render(request, "TeacherView.html")
 
 def StudentDashboard(request):
     return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
