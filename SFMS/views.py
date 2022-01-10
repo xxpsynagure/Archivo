@@ -1,7 +1,7 @@
 from django.db.models.fields import EmailField
 from django.db.utils import DataError, DatabaseError, IntegrityError
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, request, response
 from django.contrib import messages
 from SFMS import models
 from django.db import connections
@@ -164,7 +164,13 @@ def TeacherDashboard(request):
 
 def StudentProfile(request):
     if(request.method!='POST'):
-        return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
+        cur = connections['default'].cursor()
+        cur.execute(f"SELECT * FROM Student WHERE USN = '{USN}'")
+        data = cur.fetchone()
+        print(data[1])
+        return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
+                                                        'usn':data[0], 'Fname':data[1], 'Lname':data[2], 'Branch':data[3], 'Sem':data[4], 'Sec':data[5],
+                                                        'DOB':data[6], 'Email':data[7], 'Phno':data[8], 'Portfolio_links':data[10], 'About':data[11]})
     try:
         usn = request.POST.get("usn")
         Fname = request.POST.get("Fname")
@@ -192,17 +198,21 @@ def StudentProfile(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('/#Error')
     try:
-        cursor.execute(f"INSERT INTO Student VALUES('{usn}','{Fname}','{Lname}','{Branch}','{Sem}','{Sec}','{DOB}', '{Email}', '{Phno}', '{Image}', '{Portfolio_links}', '{About}');")
+        cursor.execute(f"INSERT INTO Student VALUES('{usn}','{Fname}','{Lname}','{Branch}','{Sem}','{Sec}','{DOB}', '{Email}', '{Phno}', '{Image}', '{Portfolio_links}', '{About}') ON DUPLICATE KEY UPDATE usn = '{usn}', Fname='{Fname}', Lname='{Lname}', Branch='{Branch}', Sem='{Sem}', Sec='{Sec}' , DOB='{DOB}', Email='{Email}', Phno='{Phno}', Image='{Image}', Portfolio_links='{Portfolio_links}', About='{About}';")
     except IntegrityError as e:
         print(e)
-
         messages.error(request,e)
-        return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
-
+    messages.success(request, "Saved Succesfully")
+    return redirect('StudentProfile')
 
 def TeacherProfile(request):
     if(request.method!='POST'):
-        return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
+        cur = connections['default'].cursor()
+        cur.execute(f"SELECT * FROM Teacher WHERE SSID = '{USN}'")
+        data = cur.fetchone()
+        print(data[1])
+        return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':data[1], 'Lname':data[2],
+                                                        'Designation':data[3], 'Department':data[4], 'yr_of_exp':data[5], 'Email':data[6], 'Phno':data[7], 'Skills':data[8]})
     try:
         ssid = request.POST.get("ssid")
         Fname = request.POST.get("Fname")
@@ -228,8 +238,9 @@ def TeacherProfile(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('/#Error')
     try:
-        cursor.execute(f"INSERT INTO Teacher VALUES('{ssid}','{Fname}','{Lname}','{Designation}','{Department}','{yr_of_exp}', '{Email}', '{Phno}', '{Skills}', '{Image}');")
+        cursor.execute(f"INSERT INTO Teacher VALUES('{ssid}','{Fname}','{Lname}','{Designation}','{Department}','{yr_of_exp}', '{Email}', '{Phno}', '{Skills}', '{Image}') ON DUPLICATE KEY UPDATE SSID='{ssid}', Fname='{Fname}', Lname='{Lname}', Designation='{Designation}', Department='{Department}', yr_of_exp='{yr_of_exp}', Email='{Email}', Phno='{Phno}',Skills='{Skills}', Image='{Image}';")
     except IntegrityError as e:
         print(e)
-    messages.success(request, "Registration sucessful")
-    return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
+        messages.error(request, e.args)
+    messages.success(request, "Saved sucessfully")
+    return redirect('TeacherProfile')

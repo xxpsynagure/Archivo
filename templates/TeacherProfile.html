@@ -15,39 +15,39 @@
   {% endif %}
   <form action="#" method="post" class="form">{%csrf_token%}
     <div class="inputbox">
-      <input type="text" required="required" name="ssid" >
+      <input type="text" required="required" name="ssid" value= "{{ssid}}" >
       <span>SSID</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Fname">
+      <input type="text" required="required" name="Fname" value= "{{Fname}}" >
       <span>Fname</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Lname">
+      <input type="text" required="required" name="Lname" value= "{{Lname}}" >
       <span>Lname</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Designation">
+      <input type="text" required="required" name="Designation" value="{{Designation}}">
       <span>Designation</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Department" >
+      <input type="text" required="required" name="Department" value="{{Department}}">
       <span>Department</span>
     </div>
     <div class="inputbox">
-      <input type="number" required="required" name="yr_of_exp">
+      <input type="number" required="required" name="yr_of_exp" value="{{yr_of_exp}}">
       <span>Year of Experience</span>
     </div>
     <div class="inputbox">
-      <input type="email" required="required" name="Email" >
+      <input type="email" required="required" name="Email" value="{{Email}}">
       <span>Email</span>
     </div>
     <div class="inputbox">
-      <input type="tel" required="required" name="Phno">
+      <input type="tel" required="required" name="Phno" value="{{Phno}}">
       <span>Mobile number</span>
     </div>
     <div class="inputbox">
-      <textarea name="Skills" id="" cols="30" rows="3" placeholder="Skills"></textarea>
+      <textarea name="Skills" id="" cols="30" rows="3" placeholder="Skills" >{{Skills}}</textarea>
       <span></span>
     </div>
     <br><br>

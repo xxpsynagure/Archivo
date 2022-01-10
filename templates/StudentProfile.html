@@ -15,47 +15,47 @@
   {% endif %}
   <form action="#" method="post" class="form">{%csrf_token%}
     <div class="inputbox">
-      <input type="text" required="required" name="usn" >
+      <input type="text" required="required" name="usn" value="{{usn}}">
       <span>USN</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Fname">
+      <input type="text" required="required" name="Fname" value="{{Fname}}">
       <span>Fname</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Lname">
+      <input type="text" required="required" name="Lname" value="{{Lname}}">
       <span>Lname</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Branch">
+      <input type="text" required="required" name="Branch" value="{{Branch}}">
       <span>Branch</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Sem" >
+      <input type="text" required="required" name="Sem" value="{{Sem}}">
       <span>Semester</span>
     </div>
     <div class="inputbox">
-      <input type="number" required="required" name="Sec">
+      <input type="number" required="required" name="Sec" value="{{Sec}}">
       <span>Section</span>
     </div>
     <div class="inputbox">
-      <input type="date" required="required" name="DOB" onfocus="(this.type='date')" onblur="">
+      <input type="date" required="required" name="DOB" onfocus="(this.type='date')" value="{{DOB}}">
       <span>DOB</span>
     </div>
     <div class="inputbox">
-      <input type="email" required="required" name="Email" >
+      <input type="email" required="required" name="Email" value="{{Email}}">
       <span>Email</span>
     </div>
     <div class="inputbox">
-      <input type="tel" required="required" name="Phno">
+      <input type="tel" required="required" name="Phno" value="{{Phno}}">
       <span>Mobile number</span>
     </div>
     <div class="inputbox">
-      <input type="text" required="required" name="Portfolio_links">
+      <input type="text" required="required" name="Portfolio_links" value="{{Portfolio_links}}">
       <span>Portfolio links</span>
     </div>
     <div class="inputbox">
-      <textarea name="About" id="" cols="30" rows="3" placeholder="Write about yourserlf"></textarea>
+      <textarea name="About" id="" cols="30" rows="3" placeholder="Write about yourserlf">{{About}}</textarea>
       <span></span>
     </div>
     <br><br>
