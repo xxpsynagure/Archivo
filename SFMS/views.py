@@ -171,16 +171,24 @@ def TeacherDashboard(request):
     return render(request, "TeacherDashboard.html",{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'}|{'subject':data})
 
 
+
 def StudentProfile(request):
     if(request.method!='POST'):
         cur = connections['default'].cursor()
-        cur.execute(f"SELECT * FROM Student WHERE USN = '{USN}'")
+        cur.execute(f"SELECT S.*, C.Branch, C.Sem, C.Sec FROM Student S, Class C WHERE USN = '{USN}' and S.Class = C.Class")
         data = cur.fetchone()
+        print(data)
         if data is None:
-            data = ['', '', '', '', '', '', '', '', '', '', '', '', ]
+            cur = connections['default'].cursor()
+            cur.execute(f"SELECT * FROM Registration WHERE usn_ssid = '{USN}'")
+            data = cur.fetchone()
+            return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
+                                                        'usn':data[0], 'Fname':'', 'Lname':'', 'Branch':data[4], 'Sem':'', 'Sec':'',
+                                                        'DOB':'', 'Email':data[2], 'Phno':'', 'Portfolio_links':'', 'About':''})
+            
         return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
-                                                        'usn':data[0], 'Fname':data[1], 'Lname':data[2], 'Branch':data[3], 'Sem':data[4], 'Sec':data[5],
-                                                        'DOB':data[6], 'Email':data[7], 'Phno':data[8], 'Portfolio_links':data[10], 'About':data[11]})
+                                                        'usn':data[0], 'Fname':data[1], 'Lname':data[2], 'Branch':data[10], 'Sem':data[11], 'Sec':data[12],
+                                                        'DOB':data[4], 'Email':data[5], 'Phno':data[6], 'Portfolio_links':data[8], 'About':data[9]})
     try:
         usn = request.POST.get("usn")
         Fname = request.POST.get("Fname")
@@ -194,6 +202,9 @@ def StudentProfile(request):
         Portfolio_links = request.POST.get("Portfolio_links")
         About = request.POST.get("About")
         Image = request.POST.get("Image")
+        Class = Branch + str(Sem) + Sec
+        print(Class)
+
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
@@ -221,7 +232,12 @@ def TeacherProfile(request):
         cur.execute(f"SELECT * FROM Teacher WHERE SSID = '{USN}'")
         data = cur.fetchone()
         if data is None:
-            data = ['', '', '', '', '', '', '', '', '', '']
+            cur = connections['default'].cursor()
+            cur.execute(f"SELECT * FROM Registration WHERE usn_ssid = '{USN}'")
+            data = cur.fetchone()
+            return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':'', 'Lname':'',
+                                                        'Designation':'', 'Department':data[4], 'yr_of_exp':'', 'Email':data[2], 'Phno':'', 'Skills':''})
+
         return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':data[1], 'Lname':data[2],
                                                         'Designation':data[3], 'Department':data[4], 'yr_of_exp':data[5], 'Email':data[6], 'Phno':data[7], 'Skills':data[8]})
     try:
