@@ -57,8 +57,9 @@ CREATE TABLE Teacher (
     Phno NUMERIC(13) NOT NULL,
     Skills VARCHAR(255),
     Image BLOB,
+    FOREIGN KEY (Department) REFERENCES Branch (Branch_id),
     FOREIGN KEY (ssid) REFERENCES Registration (usn_ssid)
-)
+);
 
 CREATE TABLE Student (
     usn VARCHAR(10) PRIMARY KEY,
@@ -73,21 +74,23 @@ CREATE TABLE Student (
     Image BLOB,
     Portfolio_links VARCHAR(500),
     About VARCHAR(700),
+    FOREIGN KEY (Branch) REFERENCES Branch (Branch_id),
     FOREIGN KEY (usn) REFERENCES Registration (usn_ssid)
-)
+);
 
 CREATE TABLE Subject (
     ssid VARCHAR(10) NOT NULL,
     Branch VARCHAR(50) NOT NULL,
     Sem NUMERIC(1) NOT NULL,
     Sec CHAR(1) NOT NULL,
-    Subject_code VARCHAR(6) NOT NULL,
-    Subject_name VARCHAR(50),
+    Subject_code VARCHAR(10) NOT NULL,
+    Subject_name VARCHAR(100),
     FOREIGN KEY (ssid) REFERENCES Teacher (ssid),
     FOREIGN KEY (Branch) REFERENCES Student (Branch),
     FOREIGN KEY (Sem) REFERENCES Student (Sem),
-    FOREIGN KEY (Sec) REFERENCES Student (Sec)
-)
+    FOREIGN KEY (Sec) REFERENCES Student (Sec),
+    PRIMARY KEY (ssid,Branch,Sem,Sec,Subject_code)
+);
 
 CREATE TABLE Notification (
     ssid VARCHAR(10) PRIMARY KEY,
