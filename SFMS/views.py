@@ -219,12 +219,12 @@ def StudentProfile(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('/#Error')
     try:
-        cursor.execute(f"INSERT INTO Student VALUES('{usn}','{Fname}','{Lname}','{Branch}','{Sem}','{Sec}','{DOB}', '{Email}', '{Phno}', '{Image}', '{Portfolio_links}', '{About}') ON DUPLICATE KEY UPDATE usn = '{usn}', Fname='{Fname}', Lname='{Lname}', Branch='{Branch}', Sem='{Sem}', Sec='{Sec}' , DOB='{DOB}', Email='{Email}', Phno='{Phno}', Image='{Image}', Portfolio_links='{Portfolio_links}', About='{About}';")
+        cursor.execute(f"INSERT INTO Student VALUES('{usn}','{Fname}','{Lname}','{Class}','{DOB}', '{Email}', '{Phno}', '{Image}', '{Portfolio_links}', '{About}') ON DUPLICATE KEY UPDATE usn = '{usn}', Fname='{Fname}', Lname='{Lname}', Class='{Class}', DOB='{DOB}', Email='{Email}', Phno='{Phno}', Image='{Image}', Portfolio_links='{Portfolio_links}', About='{About}';")
     except IntegrityError as e:
         print(e)
         messages.error(request,e)
     messages.success(request, "Saved Succesfully")
-    return redirect('StudentProfile')
+    return redirect('StudentDashboard')
 
 def TeacherProfile(request):
     if(request.method!='POST'):
@@ -270,4 +270,4 @@ def TeacherProfile(request):
         print(e)
         messages.error(request, e.args)
     messages.success(request, "Saved sucessfully")
-    return redirect('TeacherProfile')
+    return redirect('TeacherDashboard')
