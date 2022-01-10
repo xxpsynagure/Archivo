@@ -86,7 +86,7 @@ def doLogin(request):
             USN=data[0][0]
             if(data[0][6]=='S'):
                 print(USN)
-                return redirect("/StudentDashboard")
+                return redirect("StudentDashboard")
             return redirect("TeacherDashboard")
         else:
             messages.error(request, "Username or Password not matching, Please try again")
@@ -150,8 +150,6 @@ def trial(request): #trial purpose
     return render(request, "TeacherProfile.html")
 
 def StudentDashboard(request):
-    if request.method != 'POST':
-        return HttpResponse("Method not allowed")
 
     cur = connections['default'].cursor() 
     print(USN)
