@@ -167,7 +167,8 @@ def StudentProfile(request):
         cur = connections['default'].cursor()
         cur.execute(f"SELECT * FROM Student WHERE USN = '{USN}'")
         data = cur.fetchone()
-        print(data[1])
+        if data is None:
+            data = ['', '', '', '', '', '', '', '', '', '', '', '', ]
         return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
                                                         'usn':data[0], 'Fname':data[1], 'Lname':data[2], 'Branch':data[3], 'Sem':data[4], 'Sec':data[5],
                                                         'DOB':data[6], 'Email':data[7], 'Phno':data[8], 'Portfolio_links':data[10], 'About':data[11]})
@@ -210,14 +211,15 @@ def TeacherProfile(request):
         cur = connections['default'].cursor()
         cur.execute(f"SELECT * FROM Teacher WHERE SSID = '{USN}'")
         data = cur.fetchone()
-        print(data[1])
+        if data is None:
+            data = ['', '', '', '', '', '', '', '', '', '']
         return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':data[1], 'Lname':data[2],
                                                         'Designation':data[3], 'Department':data[4], 'yr_of_exp':data[5], 'Email':data[6], 'Phno':data[7], 'Skills':data[8]})
     try:
         ssid = request.POST.get("ssid")
         Fname = request.POST.get("Fname")
         Lname = request.POST.get("Lname")
-        Designation = request.POST.get("Department")
+        Designation = request.POST.get("Designation")
         Department = request.POST.get("Department")
         yr_of_exp = request.POST.get("yr_of_exp")
         Email = request.POST.get("Email")
