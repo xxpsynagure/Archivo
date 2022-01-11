@@ -286,8 +286,8 @@ def StudentFilePage(request, SubjectCode):
         cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' ;")
         data = {items[0]: items[0] for items in cur}
         print(data)
-        cur.execute(f"SELECT Filename from File; ")
-        filedata = {items[0]: items[0] for items in cur}
+        cur.execute(f"SELECT Filename, Uploaded from File; ")
+        filedata = {items[0]: items[1] for items in cur}
         return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata})
     
     try:

@@ -84,12 +84,12 @@
                     <div class="drive-wrapper drive-grid-view">
                         <div class="grid-items-wrapper">
                             <!-- start the for loop from here for file tiles -->
-                            {% for value in filedata.values %}
+                            {% for key in filedata.keys %}
                             <div class="drive-item module text-center">
                                 <div class="drive-item-inner module-inner">
-                                    <div class="drive-item-title"><a href="#">{{value}}</a></div>
+                                    <div class="drive-item-title"><a href="#">{{key}}</a></div>
                                     <div class="drive-item-thumb">
-                                        <a href="#"><i class="fa fa-file-text-o text-primary"></i></a>
+                                        <a href="#"><i class="fa fa-file"></i></a>
                                     </div>
                                 </div>
                                 <div class="drive-item-footer module-footer">
@@ -111,17 +111,17 @@
                                     <tr>
                                         <th class="type"></th>
                                         <th class="name truncate">Name</th>
-                                        <th class="date">Uploaded</th>
-                                        <th class="size">Size</th>
+                                        <th class="date">Uploaded date</th>
+                                        <th class="size">Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for key, value in filedata.items %}
                                     <tr>
                                         <td class="type"><i class="fa fa-file-text-o text-primary"></i></td>
-                                        <td class="name truncate"><a href="#">{{value}}</a></td>
-                                        <td class="date">Sep 23, 2015</td>
-                                        <td class="size">18 KB</td>
+                                        <td class="name truncate"><a href="#">{{key}}</a></td>
+                                        <td class="date">{{value|date:"D d M Y"}}</td>
+                                        <td class="size">{{value|time:"TIME_FORMAT"}}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
