@@ -149,26 +149,22 @@ CREATE TABLE Notification (
 /* will see below later, above checked*/
 
 CREATE TABLE Repository (
-    Repoid VARCHAR(13) PRIMARY KEY,
-    usn VARCHAR(10) NOT NULL,
+    Repoid VARCHAR(50) PRIMARY KEY,
     Reponame VARCHAR(255) NOT NULL,
-    Date_created DATE,
-    Date_last_modified DATE,
-    Time_created TIME,
-    Time_last_modified Time,
-    FOREIGN KEY (usn) REFERENCES Student (usn)
+    ssid VARCHAR(10) NOT NULL,
+    Class VARCHAR(10) NOT NULL,
+    FOREIGN KEY (ssid) REFERENCES Teacher (ssid) ON DELETE CASCADE,
+    FOREIGN KEY (Class) REFERENCES Class (Class)
 )
 
 CREATE TABLE File (
     Repoid VARCHAR(13) PRIMARY KEY,
     Filename VARCHAR(255) PRIMARY KEY,
-    Filetype VARCHAR(20) PRIMARY KEY,
-    Content VARCHAR(20000),
-    Date_created DATE,
-    Date_last_modified DATE,
-    Time_created TIME,
-    Time_last_modified TIME,
-    FOREIGN KEY (Repoid) REFERENCES Repository (Repoid)
+    Usn CHAR(10) PRIMARY KEY,
+    Content BLOB(20000),
+    Uploaded DATETIME,
+    FOREIGN KEY (Repoid) REFERENCES Repository (Repoid) ON DELETE CASCADE,
+    FOREIGN KEY (Usn) REFERENCES Student (usn)
 )
 
 -- -----------------PROCEDURE------------------------------------
