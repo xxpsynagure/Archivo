@@ -9,7 +9,7 @@
         <li class="sidebar-brand"><a href="#">Archivo Teach</a></li>
         <li class="sidebar-nav-item"><a href="#">Profile</a></li>
         <!-- <li class="sidebar-nav-item"><a href="#">Notifications</a></li> -->
-         <li class="sidebar-nav-item"><a href="#services">Make an announcement</a></li> 
+         <li class="sidebar-nav-item"><a href="#announcement">Make an announcement</a></li> 
         <li class="sidebar-nav-item"><a href="/">Log out</a></li>
     </ul>
 </nav>
@@ -51,5 +51,36 @@
 	</div>
 </div>
 </section>
+<hr>
+<br>
 
+<section id = "announcement">
+	<div class = "center">
+		<h1>Make an Announcement</h1>
+		<form action="#" method="post" class="form">{%csrf_token%}
+
+			<span>Class</span>			
+			<select class="inputbox" id="class" name="class" placeholder="Class">			 
+			  <option value="" disabled selected > Please Select </option> 
+			  {% for key,value in subject.items %}
+			  <option value="{{key}}">{{key}}</option>
+			  {% endfor %}
+			</select>
+			
+			<div class="inputbox ">
+				<input type="text" required="required" name="Phno" value=" " pattern="[A-Za-z0-9:/ ,]*">
+				<span>Title</span>
+			</div>
+			<div class="inputbox">
+				<textarea name="Content" id="" cols="50" rows="5" placeholder="Content"></textarea>
+			
+			</div>
+			<br><br><br>
+			<div class="inputbox">
+				<button type="submit" class="btn">Send</button>
+			</div>
+		  </form>
+	</div>
+	<br>
+</section> 
 {% endblock %}
