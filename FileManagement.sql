@@ -131,21 +131,6 @@ INSERT INTO Subject VALUES ('4SOTSCS009','CSE5B','18CIV59','ENVIRONMENTAL STUDIE
 INSERT INTO Subject VALUES ('4SOTSCS005','CSE5A','18CS55','APPLICATION DEVELOPMENT USING PYTHON');
 INSERT INTO Subject VALUES ('4SOTSCS005','CSE5C','18CS55','APPLICATION DEVELOPMENT USING PYTHON');
 
-CREATE TABLE Notification (
-    ssid VARCHAR(10) PRIMARY KEY,
-    Branch VARCHAR(50) NOT NULL,
-    Sem NUMERIC(1) NOT NULL,
-    Sec CHAR(1) NOT NULL,
-    Date DATE PRIMARY KEY,
-    Time TIMESTAMP PRIMARY KEY,
-    Message VARCHAR(1000) NOT NULL,
-    FOREIGN KEY (ssid) REFERENCES Teacher (ssid),
-    FOREIGN KEY (Branch) REFERENCES Subject (Branch),
-    FOREIGN KEY (Sem) REFERENCES Subject (Sem),
-    FOREIGN KEY (Sec) REFERENCES Subject (Sec)
-)
-
-
 CREATE TABLE Repository (
     Repoid VARCHAR(50) PRIMARY KEY,
     Reponame VARCHAR(255) NOT NULL,
@@ -153,7 +138,7 @@ CREATE TABLE Repository (
     Class VARCHAR(10) NOT NULL,
     FOREIGN KEY (ssid) REFERENCES Teacher (ssid) ON DELETE CASCADE,
     FOREIGN KEY (Class) REFERENCES Class (Class)
-)
+);
 
 INSERT INTO Repository VALUES ('18CS55-CSE5B-A1', 'Assignment1', '4SOTSCS005', 'CSE5B', '18CS55');
 INSERT INTO Repository VALUES ('18CS55-CSE5B-A2', 'Assignment2', '4SOTSCS005', 'CSE5B', '18CS55');
@@ -167,14 +152,31 @@ CREATE TABLE File (
     FOREIGN KEY (Repoid) REFERENCES Repository (Repoid) ON DELETE CASCADE,
     FOREIGN KEY (Usn) REFERENCES Student (usn),
     PRIMARY KEY(Repoid, Filename, Usn)
-)
-
+);
 
 -- ----------------------TRIGGER---------------------------------
 CREATE TRIGGER set_created_date
 BEFORE INSERT ON File FOR EACH ROW
     SET New.Uploaded = NOW();
 -- ----------------------TRIGGER-----------------------------------
+
+CREATE TABLE Notification (
+    ssid VARCHAR(10) NOT NULL,
+    Class VARCHAR(10) NOT NULL,
+    Sent_time DATETIME NOT NULL,
+    Title TEXT NOT NULL,
+    Message TEXT,
+    FOREIGN KEY (ssid) REFERENCES Teacher (ssid),
+    FOREIGN KEY (Class) REFERENCES Class (Class),
+    PRIMARY KEY(ssid,Class,Sent_time)
+);
+
+-- ----------------------TRIGGER 2---------------------------------
+CREATE TRIGGER notification_sent_time
+BEFORE INSERT ON Notification FOR EACH ROW
+    SET New.Sent_time = NOW();
+-- ----------------------TRIGGER 2---------------------------------
+
 
 -- -----------------PROCEDURE------------------------------------
 DELIMITER //
