@@ -6,6 +6,8 @@ from django.contrib import messages
 from SFMS import models
 from django.db import connections
 from django.core.exceptions import *
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 USN =''
 # Create your views here.
@@ -292,18 +294,24 @@ def StudentFilePage(request, SubjectCode):
     
     try:
         FileName = request.POST.get("FileName")
-        File = request.POST.get("fileInput")
+        File = request.FILES['fileInput']
         RepoName = request.POST.get("RepoName")
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')
 
+
+
     print(FileName.split('\\')[-1], RepoName, USN, type(File))
     FileName = FileName.split('\\')[-1]
+    path = default_storage.save('tmp/'+FileName, ContentFile(File.read())) # Downloading the file
     cur = connections['default'].cursor()
     cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Content) VALUES 
                     ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}'), '{FileName}', '{USN}', '{File}')
                     """)
+    cur.execute(f"SELECT Filename,Content from file where Usn = '{USN}'")
+    file = cur.fetchone()
+    print(type(file[1]))
 
     return redirect('StudentFilePage', SubjectCode)
