@@ -20,13 +20,8 @@
             <br>
             <!-- <h4 style="font-family: cursive;">Welcome to Student Dashboard</h4> -->
             <h1 class="mb-1" style="font-family: cursive;">Archivo</h1>
-            <h4 class="text-secondary mb-0"><em>A single place to manage all your files</em></h4><br>
-            <!-- <a class="btn btn-primary btn-xl" href="#services">Let's dive in</a> -->
-            <!-- <a class="btn btn-dark btn-xl" href="#services">What We Offer</a> -->
+            <h4 class="text-secondary mb-0"><em>A single place to manage all your files</em></h4><br>    
         </div>
-        <!-- <h2 class="mb-4">The buttons below are impossible to resist...</h2>
-        <a class="btn btn-xl btn-light me-4" href="#!">Click Me!</a>
-        <a class="btn btn-xl btn-dark" href="#!">Look at Me!</a> -->
     </div>
 </header>
 
@@ -37,7 +32,7 @@
 		{% for key, value in subject.items %}
 			
 		<div class="col-md-4">
-			<div class="{%cycle 'dbox dbox--color-1' 'dbox dbox--color-2' 'dbox dbox--color-3' 'dbox dbox--color-1' %}">
+			<div class="{%cycle 'dbox dbox--color-1' 'dbox dbox--color-2' 'dbox dbox--color-3' %}">
 				<div class="dbox__icon">
 					<i class="glyphicon glyphicon-cloud"></i>
 				</div>
@@ -52,39 +47,9 @@
 			</div>
 		</div>
 		{% endfor %}
-		<!-- <div class="col-md-4">
-			<div class="dbox dbox--color-2">
-				<div class="dbox__icon">
-					<i class="glyphicon glyphicon-download"></i>
-				</div>
-				<div class="dbox__body">
-					<span class="dbox__count">5-B</span>
-					<span class="dbox__title">COMPUTER SCIENCE AND ENGINEERING</span>
-				</div>
-				
-				<div class="dbox__action">
-					<button class="btn dbox__action__btn" onclick="window.location.href=''">Visit</button>
-				</div>				
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="dbox dbox--color-3">
-				<div class="dbox__icon">
-					<i class="glyphicon glyphicon-heart"></i>
-				</div>
-				<div class="dbox__body">
-					<span class="dbox__count">5-C</span>
-					<span class="dbox__title">COMPUTER SCIENCE AND ENGINEERING</span>
-				</div>
-				
-				<div class="dbox__action">
-					<a class="dbox__action__btn" href="#">Visit</a>
-				</div>				
-			</div>
-		</div> -->
+
 	</div>
 </div>
 </section>
-
 
 {% endblock %}

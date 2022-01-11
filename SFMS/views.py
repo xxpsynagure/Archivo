@@ -156,7 +156,13 @@ def trial(request): #trial purpose
     return render(request, "TeacherView.html")
 
 def StudentDashboard(request):
-    return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
+    cur = connections['default'].cursor()
+    cur.execute(f"SELECT S.Subject_code, S.Subject_name FROM Subject S WHERE S.Class = (SELECT Class FROM Student WHERE usn = '{USN}')")
+    data ={}
+    for items in cur:
+        data[items[0]] = items[1]
+    print(data)
+    return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
 
 def TeacherDashboard(request): 
     cur=connections['default'].cursor()
