@@ -330,9 +330,10 @@
 .drive-wrapper .drive-item-title {
     margin-bottom: 15px;
     max-width: 100px;
-    white-space: pre-wrap;
-    overflow: visible;
-    text-overflow: ellipsis
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:clip;
+    overflow-wrap: break-word;
 }
 
 .drive-wrapper .drive-item-title a {

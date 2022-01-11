@@ -155,17 +155,24 @@ CREATE TABLE Repository (
     FOREIGN KEY (Class) REFERENCES Class (Class)
 )
 
+INSERT INTO Repository VALUES ('18CS55-CSE5B-A1', 'Assignment1', '4SOTSCS005', 'CSE5B', '18CS55');
+INSERT INTO Repository VALUES ('18CS55-CSE5B-A2', 'Assignment2', '4SOTSCS005', 'CSE5B', '18CS55');
+
 CREATE TABLE File (
-    Repoid VARCHAR(13) NOT NULL,
+    Repoid VARCHAR(50) NOT NULL,
     Filename VARCHAR(255) NOT NULL,
     Usn CHAR(10) NOT NULL,
-    Content BLOB(20000),
+    Content BLOB,
     Uploaded DATETIME,
     FOREIGN KEY (Repoid) REFERENCES Repository (Repoid) ON DELETE CASCADE,
     FOREIGN KEY (Usn) REFERENCES Student (usn),
     PRIMARY KEY(Repoid, Filename, Usn)
 )
 
+
+CREATE TRIGGER set_created_date
+AFTER INSERT ON File FOR EACH ROW
+    SET @Uploaded = NOW();
 -- ----------------------TRIGGER---------------------------------
 DELIMITER ;;
 CREATE TRIGGER set_created_date BEFORE INSERT ON File FOR EACH ROW

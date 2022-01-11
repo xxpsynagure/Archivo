@@ -279,5 +279,30 @@ def TeacherProfile(request):
     return redirect('TeacherDashboard')
 
 
-def StudentFilePage(request, SubjectName):
-    return render(request, 'FilePage.html', {'SubjectName':SubjectName})
+def StudentFilePage(request, SubjectCode):
+    if request.method != "POST":
+        cur = connections['default'].cursor()
+        SubjectCode = str(SubjectCode)
+        cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' ;")
+        data = {items[0]: items[0] for items in cur}
+        print(data)
+        cur.execute(f"SELECT Filename from File; ")
+        filedata = {items[0]: items[0] for items in cur}
+        return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata})
+    
+    try:
+        FileName = request.POST.get("FileName")
+        File = request.POST.get("fileInput")
+        RepoName = request.POST.get("RepoName")
+    except ObjectDoesNotExist as e:
+        print(e)
+        messages.warning(request, "Form not filled, \n Please check again")
+        return redirect('#')
+
+    print(FileName.split('\\')[-1], RepoName, USN, type(File))
+    cur = connections['default'].cursor()
+    cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Content) VALUES 
+                    ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}'), '{FileName}', '{USN}', '{File}')
+                    """)
+
+    return redirect('StudentFilePage', SubjectCode)

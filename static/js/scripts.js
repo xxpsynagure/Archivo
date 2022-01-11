@@ -83,3 +83,9 @@ function fadeIn(el, display) {
 $(function(){
     $("[data-toggle='tooltip']").tooltip();
 })
+
+document.getElementById("fileInput").onchange = function() {
+    document.getElementById("FileName").value = document.getElementById("fileInput").value
+    document.getElementById("RepoName").value =  document.getElementById("RepoInput").value
+    document.getElementById("form-control").submit();
+};
