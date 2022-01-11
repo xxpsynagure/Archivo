@@ -153,7 +153,7 @@ def trial(request): #trial purpose
     # p=models.Registration.objects.raw('SELECT * FROM Registration')[0]
     # print(p.username,p.email)
     
-    return render(request, "TeacherView.html")
+    return render(request, "FilePage.html")
 
 def StudentDashboard(request):
     cur = connections['default'].cursor()
@@ -277,3 +277,7 @@ def TeacherProfile(request):
         messages.error(request, e.args)
     messages.success(request, "Saved sucessfully")
     return redirect('TeacherDashboard')
+
+
+def StudentFilePage(request, SubjectName):
+    return render(request, 'FilePage.html', {'SubjectName':SubjectName})

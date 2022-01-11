@@ -15,5 +15,6 @@ urlpatterns = [
     path("TeacherDashboard",views.TeacherDashboard, name="TeacherDashboard"),
     path("StudentDashboard/StudentProfile", views.StudentProfile, name="StudentProfile"),
     path("TeacherDashboard/TeacherProfile", views.TeacherProfile, name="TeacherProfile"),
+    path("StudentDashboard/<SubjectName>", views.StudentFilePage, name="StudentFilePage")
 ]
 

@@ -78,3 +78,8 @@ function fadeIn(el, display) {
         }
     })();
 };
+
+
+$(function(){
+    $("[data-toggle='tooltip']").tooltip();
+})
