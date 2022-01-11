@@ -146,8 +146,6 @@ CREATE TABLE Notification (
 )
 
 
-/* will see below later, above checked*/
-
 CREATE TABLE Repository (
     Repoid VARCHAR(50) PRIMARY KEY,
     Reponame VARCHAR(255) NOT NULL,
@@ -158,14 +156,24 @@ CREATE TABLE Repository (
 )
 
 CREATE TABLE File (
-    Repoid VARCHAR(13) PRIMARY KEY,
-    Filename VARCHAR(255) PRIMARY KEY,
-    Usn CHAR(10) PRIMARY KEY,
+    Repoid VARCHAR(13) NOT NULL,
+    Filename VARCHAR(255) NOT NULL,
+    Usn CHAR(10) NOT NULL,
     Content BLOB(20000),
     Uploaded DATETIME,
     FOREIGN KEY (Repoid) REFERENCES Repository (Repoid) ON DELETE CASCADE,
-    FOREIGN KEY (Usn) REFERENCES Student (usn)
+    FOREIGN KEY (Usn) REFERENCES Student (usn),
+    PRIMARY KEY(Repoid, Filename, Usn)
 )
+
+-- ----------------------TRIGGER---------------------------------
+DELIMITER ;;
+CREATE TRIGGER set_created_date BEFORE INSERT ON File FOR EACH ROW
+BEGIN
+    SET NEW.uploaded = NOW();
+END;;
+DELIMITER ;
+-- ----------------------TRIGGER-----------------------------------
 
 -- -----------------PROCEDURE------------------------------------
 DELIMITER //
