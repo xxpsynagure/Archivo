@@ -172,10 +172,26 @@ def TeacherDashboard(request):
     
     data ={}
     for item in cur:
-        name = item[0] + '-'+ str(item[1]) + '' + item[2]
+        name = item[0] + '-'+ str(item[1]) + item[2]
         data[name]=item[4]
-        
     print(data)
+
+    if(request.method == 'POST'):
+        try:
+            Class = "".join(request.POST.get("class").split('-'))
+            Title = request.POST.get("title")
+            Content = request.POST.get("content")
+            print(Class,Title,Content)
+
+            cur=connections['default'].cursor()
+            cur.execute(f"INSERT INTO Notification(ssid,Class,Title,Message) VALUES ('{USN}','{Class}','{Title}','{Content}');")
+            messages.success(request,"Message Sent")
+            
+        except (ObjectDoesNotExist,AttributeError,TypeError) as e:
+            print(e)
+            messages.warning(request, "Form not filled, \n Please check again")
+            return redirect('TeacherDashboard')    
+        
     return render(request, "TeacherDashboard.html",{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'}|{'subject':data})
 
 
@@ -315,3 +331,6 @@ def StudentFilePage(request, SubjectCode):
     print(type(file[1]))
 
     return redirect('StudentFilePage', SubjectCode)
+
+def notifications(request):
+    return render(request, "notifications.html")
