@@ -170,16 +170,10 @@ CREATE TABLE File (
 )
 
 
-CREATE TRIGGER set_created_date
-AFTER INSERT ON File FOR EACH ROW
-    SET @Uploaded = NOW();
 -- ----------------------TRIGGER---------------------------------
-DELIMITER ;;
-CREATE TRIGGER set_created_date BEFORE INSERT ON File FOR EACH ROW
-BEGIN
-    SET NEW.uploaded = NOW();
-END;;
-DELIMITER ;
+CREATE TRIGGER set_created_date
+BEFORE INSERT ON File FOR EACH ROW
+    SET New.Uploaded = NOW();
 -- ----------------------TRIGGER-----------------------------------
 
 -- -----------------PROCEDURE------------------------------------

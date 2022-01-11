@@ -300,6 +300,7 @@ def StudentFilePage(request, SubjectCode):
         return redirect('#')
 
     print(FileName.split('\\')[-1], RepoName, USN, type(File))
+    FileName = FileName.split('\\')[-1]
     cur = connections['default'].cursor()
     cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Content) VALUES 
                     ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}'), '{FileName}', '{USN}', '{File}')

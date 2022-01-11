@@ -37,7 +37,7 @@
                     <div class="content-header-wrapper">
                         <h2 class="title">{{SubjectName}}</h2>
                         <div class="actions">
-                            <form action="#" method="post" id="form-control">{%csrf_token%}
+                            <form action="#" method="post" id="form-control" enctype="multipart/form-data">{%csrf_token%}
                                 <input type="file" id="fileInput" style="display: none;" name="fileInput">
                                 <input type="text" style="display: none;" name="FileName" id="FileName">
                                 <input type="text" style="display: none;" name="RepoName" id="RepoName">
@@ -59,8 +59,8 @@
                                 <!-- <select name="Repoid" id="Repoid"> -->
                                     <!-- <ul class="dropdown-menu"> -->
                                         <option value="" selected disabled>SELECT REPO</option>
-                                        {% for key, value in data.items %}
-                                        <option value="{{key}}">{{value}}</option>
+                                        {% for value in data.values %}
+                                        <option value="{{value}}">{{value}}</option>
                                         {% endfor %}
                                     <!-- </ul> -->
                                 </select>
@@ -84,7 +84,7 @@
                     <div class="drive-wrapper drive-grid-view">
                         <div class="grid-items-wrapper">
                             <!-- start the for loop from here for file tiles -->
-                            {% for key,value in filedata.items %}
+                            {% for value in filedata.values %}
                             <div class="drive-item module text-center">
                                 <div class="drive-item-inner module-inner">
                                     <div class="drive-item-title"><a href="#">{{value}}</a></div>
