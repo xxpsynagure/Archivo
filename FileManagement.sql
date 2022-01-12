@@ -136,9 +136,10 @@ CREATE TABLE Repository (
     Reponame VARCHAR(255) NOT NULL,
     ssid VARCHAR(10) NOT NULL,
     Class VARCHAR(10) NOT NULL,
+    Subject_code VARCHAR(10) ,
     FOREIGN KEY (ssid) REFERENCES Teacher (ssid) ON DELETE CASCADE,
     FOREIGN KEY (Class) REFERENCES Class (Class)
-);
+)
 
 INSERT INTO Repository VALUES ('18CS55-CSE5B-A1', 'Assignment1', '4SOTSCS005', 'CSE5B', '18CS55');
 INSERT INTO Repository VALUES ('18CS55-CSE5B-A2', 'Assignment2', '4SOTSCS005', 'CSE5B', '18CS55');

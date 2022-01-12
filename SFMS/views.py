@@ -304,7 +304,7 @@ def StudentFilePage(request, SubjectCode):
         cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
         data = {items[0]: items[0] for items in cur}
         print(data)
-        cur.execute(f"SELECT Filename, Uploaded from File; ")
+        cur.execute(f"select filename, Uploaded from file where repoid in (select repoid from repository where subject_code = '{SubjectCode}'); ")
         filedata = {items[0]: items[1] for items in cur}
         return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata})
     
@@ -317,11 +317,9 @@ def StudentFilePage(request, SubjectCode):
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')
 
-
-
     print(FileName.split('\\')[-1], RepoName, USN, type(File))
     FileName = FileName.split('\\')[-1]
-    path = default_storage.save('tmp/'+FileName, ContentFile(File.read())) # Downloading the file
+    # path = default_storage.save('tmp/'+FileName, ContentFile(File.read())) # Downloading the file
     cur = connections['default'].cursor()
     cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Content) VALUES 
                     ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}'), '{FileName}', '{USN}', '{File}')
@@ -335,10 +333,10 @@ def StudentFilePage(request, SubjectCode):
 def TeacherFilePage(request, ClassName):
     if request.method != "POST":
         cur = connections['default'].cursor()
-        cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' ;")
+        cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
         data = {items[0]: items[0] for items in cur}
         print(data)
-        cur.execute(f"SELECT Filename, Uploaded from File; ")
+        cur.execute(f"select filename,Uploaded from file where repoid in (select repoid from repository where Class = '{ClassName.replace('-','')}'); ")
         filedata = {items[0]: items[1] for items in cur}
         return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata})
 
