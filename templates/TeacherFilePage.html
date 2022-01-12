@@ -127,10 +127,12 @@
                                     </div>
                                 </div>
                                 <div class="drive-item-footer module-footer">
-                                    <ul class="utilities list-inline">
-                                        <li><a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Download"><i class="fa fa-download"></i></a></li>
-                                        <li><a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="fa fa-trash"></i></a></li>
-                                    </ul>
+                                    <form action="/downloadFile" method="post">{%csrf_token%}
+                                        <ul class="utilities list-inline">
+                                            <button value="{{key}}" id="downloadButton" name="downloadButton" ><i class="fa fa-download"></i></a></button>
+                                            <!-- <button><a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="fa fa-trash"></i></a></button> -->
+                                        </ul>
+                                    </form>
                                 </div>
                             </div>
                             {% endfor %}
@@ -168,10 +170,26 @@
         </section>
     </div>
 </div>
+
+<script>
+    async function downloadFile() {
+        console.log(document.getElementById('downloadButton').value)
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        res = await fetch('/downloadFile',{
+        method:'POST',
+        headers:{
+            'content-type':'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body:JSON.stringify({
+            name: document.getElementById('downloadButton').value
+        })
+    })
+    data = await res.json()
+    console.log(data)
+    }
+
+</script>
 {% endblock %}
 
-<!-- <script>
-    document.getElementById("fileInput").onchange = function() {
-    document.getElementById("form-control").submit();
-};
-</script> -->
+

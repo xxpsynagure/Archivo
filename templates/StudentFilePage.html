@@ -37,7 +37,7 @@
                     <div class="content-header-wrapper">
                         <h2 class="title">{{SubjectName}}</h2>
                         <div class="actions">
-                            <form action="#" method="post" id="form-control" enctype="multipart/form-data">{%csrf_token%}
+                            <form action="" method="post" id="form-control" enctype="multipart/form-data">{%csrf_token%}
                                 <input type="file" id="fileInput" style="display: none;" name="fileInput">
                                 <input type="text" style="display: none;" name="FileName" id="FileName">
                                 <input type="text" style="display: none;" name="RepoName" id="RepoName">
@@ -59,9 +59,9 @@
                                 <!-- <select name="Repoid" id="Repoid"> -->
                                     <!-- <ul class="dropdown-menu"> -->
                                         <option value="" selected disabled>SELECT REPO</option>
-                                        {% for value in data.values %}
-                                        <option value="{{value}}">{{value}}</option>
-                                        {% endfor %}
+                                        {% for repo in data.values %}
+                                        <option value="{{value}}">{{repo}}</option>
+                                        
                                     <!-- </ul> -->
                                 </select>
                             </div>
@@ -93,17 +93,19 @@
                                     </div>
                                 </div>
                                 <div class="drive-item-footer module-footer">
-                                    <ul class="utilities list-inline">
-                                        <li><a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Download"><i class="fa fa-download"></i></a></li>
-                                        <li><a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="fa fa-trash"></i></a></li>
-                                    </ul>
+                                    <form action="/deleteFile" method="post">{%csrf_token%}
+                                        <ul class="utilities list-inline">
+                                            <button value="{{key}}" id="deleteButton" name="deleteButton" ><i class="fa fa-trash"></i></a></button>
+                                            <!-- <button><a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="fa fa-trash"></i></a></button> -->
+                                        </ul>
+                                    </form>
                                 </div>
                             </div>
                             {% endfor %}
                             
                         </div>
                     </div>
-
+                    
                     <div class="drive-wrapper drive-list-view">
                         <div class="table-responsive drive-items-table-wrapper">
                             <table class="table">
@@ -123,11 +125,12 @@
                                         <td class="name truncate"><a href="#">{{key}}</a></td>
                                         <td class="date">{{value|date:"D d M Y"}}</td>
                                         <td class="size">{{value|time:"TIME_FORMAT"}}</td>
+                                        <td class="repo">{{repo}}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
-                        </div>
+                        </div>          {% endfor %}
                     </div>
                 </div>
             </div>

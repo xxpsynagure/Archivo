@@ -8,6 +8,8 @@ from django.db import connections
 from django.core.exceptions import *
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+import json
+import base64
 
 USN =''
 # Create your views here.
@@ -304,7 +306,7 @@ def StudentFilePage(request, SubjectCode):
         cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
         data = {items[0]: items[0] for items in cur}
         print(data)
-        cur.execute(f"select filename, Uploaded from file where repoid in (select repoid from repository where subject_code = '{SubjectCode}'); ")
+        cur.execute(f"select filename, Uploaded from file where repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}'; ")
         filedata = {items[0]: items[1] for items in cur}
         return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata})
     
@@ -320,13 +322,18 @@ def StudentFilePage(request, SubjectCode):
     print(FileName.split('\\')[-1], RepoName, USN, type(File))
     FileName = FileName.split('\\')[-1]
     # path = default_storage.save('tmp/'+FileName, ContentFile(File.read())) # Downloading the file
+    print(File.content_type)
+    uploadFile = str(File.read())
+    # with open(uploadFile,"wb") as f:
+    #     f.replace("'","_")
+    # print(type(uploadFile))
+    uploadFile = uploadFile.replace("'","_")
     cur = connections['default'].cursor()
     cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Content) VALUES 
-                    ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}'), '{FileName}', '{USN}', '{File}')
+                    ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}'), '{FileName}', '{USN}', '{uploadFile}')
                     """)
     cur.execute(f"SELECT Filename,Content from file where Usn = '{USN}'")
     file = cur.fetchone()
-    print(type(file[1]))
 
     return redirect('StudentFilePage', SubjectCode)
 
@@ -335,8 +342,8 @@ def TeacherFilePage(request, ClassName):
         cur = connections['default'].cursor()
         cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
         data = {items[0]: items[0] for items in cur}
-        print(data)
-        cur.execute(f"select filename,Uploaded from file where repoid in (select repoid from repository where Class = '{ClassName.replace('-','')}'); ")
+        # print(data)
+        cur.execute(f"select filename,Uploaded from file where repoid in (select repoid from repository where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}'); ")
         filedata = {items[0]: items[1] for items in cur}
         return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata})
 
@@ -371,3 +378,33 @@ def notifications(request):
     print(data)
 
     return render(request, "notifications.html",{'username':greeting()}|{'message':data})
+
+
+def downloadFile(request):
+    if request.method == 'POST':
+        # msg = json.loads(request.body)
+        # print(msg)
+        # return HttpResponse(json.dumps({'received':msg}))
+
+        msg = request.POST.get('downloadButton')
+        cur = connections['default'].cursor()
+        cur.execute(f"SELECT Content from file where Filename = '{msg}'")
+        data = cur.fetchone()
+        # print(data[0])
+        with open('tmp/'+msg, 'w') as writefile:
+            writefile.write(data[0][2:-1].replace("_","'"))
+
+        return redirect('TeacherFilePage', request.META['HTTP_REFERER'][22:].split('/')[1])
+
+def deleteFile(request):
+    if request.method == 'POST':
+        # msg = json.loads(request.body)
+        # print(msg)
+        # return HttpResponse(json.dumps({'received':msg}))
+
+        msg = request.POST.get('deleteButton')
+        cur = connections['default'].cursor()
+        cur.execute(f"delete from file where Filename = '{msg}'")
+        
+
+        return redirect('StudentFilePage', request.META['HTTP_REFERER'][22:].split('/')[1])
