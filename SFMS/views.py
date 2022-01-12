@@ -356,4 +356,20 @@ def TeacherFilePage(request, ClassName):
     return redirect('TeacherFilePage', ClassName)
 
 def notifications(request):
-    return render(request, "notifications.html")
+    cur = connections['default'].cursor()
+    cur.execute(f"""SELECT DISTINCT M.* FROM Message_recieved M
+                    WHERE M.Class = (SELECT S.Class FROM Student S WHERE S.usn = '{USN}')
+                    ORDER BY M.Sent_time DESC;""")
+    #data = cur.fetchall()
+    data=[]
+    for tuple in cur.fetchall():
+        dict = {}
+        dict['name'] = tuple[1] + ' ' + tuple[2]
+        dict['subject'] = tuple[3].capitalize()
+        dict['sent_time'] = tuple[4]
+        dict['title'] = tuple[5]
+        dict['content'] = tuple[6]
+        data.append(dict)
+    print(data)
+
+    return render(request, "notifications.html",{'username':greeting()}|{'message':data})

@@ -11,21 +11,27 @@
     <h2>Inbox</h2>
     <p>Check your messages here</p>
 
-    <div class="media border p-3">
-      <img src="{%static 'assets/images/user.png' %}" alt="John Doe" class="mr-3 mt-3 rounded-circle" style="width:60px;">
+    {% for dict in message%}
+    <div class="media border p-3" style="background-color:{%cycle '#F69770' '#ffff98' '#98ff98' %}">
+      <img src="{%static 'assets/images/user.png' %}" alt="profile_image" class="mr-3 mt-3 rounded-circle" style="width:60px;">
       <div class="media-body" >
-        <h4>John Doe <small><i>Posted on February 19, 2016</i></small></h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>      
+        <h4 style="font-family:sans-serif">{{dict.name}} <small><i style="padding-left: 100px;">Posted on {{dict.sent_time}}</i></small></h4>
+        <p style="color:brown">{{dict.subject}}</p>
+        <br>
+        <h3 style="font-family:sans-serif">{{dict.title}}</h3>
+        <p>{{dict.content}}</p>      
       </div>
     </div>
     <hr>
-    <div class="media border p-3">
+    {% endfor %}
+    
+    <!-- <div class="media border p-3">
         <img src="{%static 'assets/images/user.png' %}" alt="John Doe" class="mr-3 mt-3 rounded-circle" style="width:60px;">
         <div class="media-body">
           <h4>John Doe <small><i>Posted on February 19, 2016</i></small></h4>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>      
         </div>
-      </div>
+      </div> -->
 </div>
 
 {% endblock %}

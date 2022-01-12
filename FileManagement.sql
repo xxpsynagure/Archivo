@@ -185,3 +185,11 @@ BEGIN
 	SELECT Username FROM Registration WHERE usn_ssid = USN; 
 END//
 -- --------------------------------------------------------------------
+
+
+CREATE VIEW Message_recieved AS 
+SELECT T.Image, T.Fname, T.Lname, S.Subject_name, N.Sent_time, N.Title, N.Message, N.CLass
+FROM Notification N
+JOIN Teacher T ON N.ssid = T.ssid
+JOIN Subject S ON N.ssid = S.ssid
+JOIN Class C ON N.Class = C.Class;
