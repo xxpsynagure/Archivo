@@ -60,8 +60,8 @@
                                     <!-- <ul class="dropdown-menu"> -->
                                         <option value="" selected disabled>SELECT REPO</option>
                                         {% for repo in data.values %}
-                                        <option value="{{value}}">{{repo}}</option>
-                                        
+                                        <option value="{{repo}}">{{repo}}</option>
+                                        {% endfor %}
                                     <!-- </ul> -->
                                 </select>
                             </div>
@@ -123,14 +123,14 @@
                                     <tr>
                                         <td class="type"><i class="fa fa-file-text-o text-primary"></i></td>
                                         <td class="name truncate"><a href="#">{{key}}</a></td>
-                                        <td class="date">{{value|date:"D d M Y"}}</td>
+                                        <td class="date">{{value|date:"d M Y"}}</td>
                                         <td class="size">{{value|time:"TIME_FORMAT"}}</td>
-                                        <td class="repo">{{repo}}</td>
+                                        <td class="repo">{{key}}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
-                        </div>          {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -148,12 +148,12 @@ CREATE TABLE File (
     Repoid VARCHAR(50) NOT NULL,
     Filename VARCHAR(255) NOT NULL,
     Usn CHAR(10) NOT NULL,
-    Content BLOB,
+    Content MEDIUMBLOB,
     Uploaded DATETIME,
     FOREIGN KEY (Repoid) REFERENCES Repository (Repoid) ON DELETE CASCADE,
     FOREIGN KEY (Usn) REFERENCES Student (usn),
     PRIMARY KEY(Repoid, Filename, Usn)
-);
+)
 
 -- ----------------------TRIGGER---------------------------------
 CREATE TRIGGER set_created_date

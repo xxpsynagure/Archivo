@@ -9,7 +9,7 @@
     <div class="view-account">
         <section class="module">
             <div class="module-inner">
-
+<!-- 
                 <div class="side-bar">
                     <div class="user-info">
                         <img class="img-profile img-circle img-responsive center-block" src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="">
@@ -31,7 +31,7 @@
                             <li><a href="user-drive.html"><span class="fa fa-th"></span> Drive</a></li>
                             <li><a href="#"><span class="fa fa-clock-o"></span> Reminders</a></li>
                         </ul>
-                    </nav>
+                    </nav> -->
                 </div>
 
                 <div class="content-panel">
@@ -157,8 +157,9 @@
                                     <tr>
                                         <td class="type"><i class="fa fa-file-text-o text-primary"></i></td>
                                         <td class="name truncate"><a href="#">{{key}}</a></td>
-                                        <td class="date">{{value|date:"D d M Y"}}</td>
+                                        <td class="date">{{value|date:"d M Y"}}</td>
                                         <td class="size">{{value|time:"TIME_FORMAT"}}</td>
+                                        <td class="repo">{{key}}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

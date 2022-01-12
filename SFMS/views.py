@@ -305,9 +305,9 @@ def StudentFilePage(request, SubjectCode):
         SubjectCode = str(SubjectCode)
         cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
         data = {items[0]: items[0] for items in cur}
-        print(data)
         cur.execute(f"select filename, Uploaded from file where repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}'; ")
         filedata = {items[0]: items[1] for items in cur}
+        print(filedata)
         return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata})
     
     try:
@@ -330,7 +330,8 @@ def StudentFilePage(request, SubjectCode):
     uploadFile = uploadFile.replace("'","_")
     cur = connections['default'].cursor()
     cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Content) VALUES 
-                    ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}'), '{FileName}', '{USN}', '{uploadFile}')
+                    ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}' AND Class = (SELECT Class FROM STUDENT WHERE USN = '{USN}') ), 
+                    '{FileName}', '{USN}', '{uploadFile}')
                     """)
     cur.execute(f"SELECT Filename,Content from file where Usn = '{USN}'")
     file = cur.fetchone()
@@ -391,8 +392,13 @@ def downloadFile(request):
         cur.execute(f"SELECT Content from file where Filename = '{msg}'")
         data = cur.fetchone()
         # print(data[0])
-        with open('tmp/'+msg, 'w') as writefile:
-            writefile.write(data[0][2:-1].replace("_","'"))
+        with open('tmp/'+msg, 'wb') as writefile:
+            writefile.write(data[0])
+
+        with open('tmp/'+msg, 'r') as f:
+            data = f.read()
+        with open('tmp/'+msg, "w") as wf:
+            wf.write(data[2:-1].replace("_","'"))
 
         return redirect('TeacherFilePage', request.META['HTTP_REFERER'][22:].split('/')[1])
 
