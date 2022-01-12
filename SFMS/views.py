@@ -155,7 +155,7 @@ def trial(request): #trial purpose
     # p=models.Registration.objects.raw('SELECT * FROM Registration')[0]
     # print(p.username,p.email)
     
-    return render(request, "FilePage.html")
+    return render(request, "TeacherFilePage.html")
 
 def StudentDashboard(request):
     cur = connections['default'].cursor()
@@ -301,7 +301,7 @@ def StudentFilePage(request, SubjectCode):
     if request.method != "POST":
         cur = connections['default'].cursor()
         SubjectCode = str(SubjectCode)
-        cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' ;")
+        cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
         data = {items[0]: items[0] for items in cur}
         print(data)
         cur.execute(f"SELECT Filename, Uploaded from File; ")
@@ -331,6 +331,29 @@ def StudentFilePage(request, SubjectCode):
     print(type(file[1]))
 
     return redirect('StudentFilePage', SubjectCode)
+
+def TeacherFilePage(request, ClassName):
+    if request.method != "POST":
+        cur = connections['default'].cursor()
+        cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' ;")
+        data = {items[0]: items[0] for items in cur}
+        print(data)
+        cur.execute(f"SELECT Filename, Uploaded from File; ")
+        filedata = {items[0]: items[1] for items in cur}
+        return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata})
+
+    try:
+        RepoName = request.POST.get('AssignmentName')
+        Repoid = request.POST.get('AssignmentID')
+    except ObjectDoesNotExist as e:
+        print(e)
+        messages.warning(request, "Form not filled, \n Please check again")
+        return redirect('#')
+    ClassName = ClassName.replace('-','')
+    print(Repoid, RepoName, USN, ClassName, )
+    cur = connections['default'].cursor()
+    cur.execute(f"INSERT INTO Repository VALUES ('{Repoid}', '{RepoName}', '{USN}', '{ClassName}', ( SELECT Subject_code FROM Subject WHERE ssid = '{USN}' and Class = '{ClassName}') )")
+    return redirect('TeacherFilePage', ClassName)
 
 def notifications(request):
     return render(request, "notifications.html")

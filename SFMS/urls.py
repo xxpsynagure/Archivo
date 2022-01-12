@@ -16,6 +16,7 @@ urlpatterns = [
     path("StudentDashboard/StudentProfile", views.StudentProfile, name="StudentProfile"),
     path("TeacherDashboard/TeacherProfile", views.TeacherProfile, name="TeacherProfile"),
     path("StudentDashboard/<SubjectCode>", views.StudentFilePage, name="StudentFilePage"),
+    path("TeacherDashboard/<ClassName>", views.TeacherFilePage, name="TeacherFilePage"),
     path("notifications",views.notifications, name="notifications"),
 ]
 

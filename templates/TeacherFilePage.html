@@ -9,7 +9,8 @@
     <div class="view-account">
         <section class="module">
             <div class="module-inner">
-                <!-- <div class="side-bar">
+
+                <div class="side-bar">
                     <div class="user-info">
                         <img class="img-profile img-circle img-responsive center-block" src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="">
                         <ul class="meta list list-unstyled">
@@ -31,19 +32,52 @@
                             <li><a href="#"><span class="fa fa-clock-o"></span> Reminders</a></li>
                         </ul>
                     </nav>
-                </div> -->
+                </div>
 
                 <div class="content-panel">
                     <div class="content-header-wrapper">
-                        <h2 class="title">{{SubjectName}}</h2>
+                        <h2 class="title">{{ClassName}}</h2>
                         <div class="actions">
-                            <form action="#" method="post" id="form-control" enctype="multipart/form-data">{%csrf_token%}
-                                <input type="file" id="fileInput" style="display: none;" name="fileInput">
-                                <input type="text" style="display: none;" name="FileName" id="FileName">
-                                <input type="text" style="display: none;" name="RepoName" id="RepoName">
-                            </form>
-                                <button class="btn btn-success" onclick="document.getElementById('fileInput').click();"><i class="fa fa-plus"></i> Upload New Item</button>
+                            <!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Sign Up
+  </button> -->
+  
+                            <!-- Modal -->
+                            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                    <div class="column" id="main">
+                                        <h2 style="font-style: italic;">Create New Assignment </h2>
+                                        <!-- <h3>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h3> -->
+                                        <form action="#" method="post">{%csrf_token%}
+                                        <div class="form-group">
+                                            <label for="exampleInputName">Assignment Name</label>
+                                            <input type="name" class="form-control" id="AssignmentName" name="AssignmentName" placeholder="Assignment Name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleInputEmail1">Comments </label>
+                                            <input type="text" class="form-control" id="Comments"  placeholder="Comments">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleInputPassword1">AssignmentID</label>
+                                            <input type="text" class="form-control" id="AssignmentID" name="AssignmentID" placeholder="SubjectCode-ClassName-A1">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Create</button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        
+                                    </div>
+                                    
+                                    </div>
+                                </div>
+                                </div>
                             </div>
+                                <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-plus"></i> Create Assignment</button>
+                            </div>
+                            <!-- Modal end -->
                     </div>
                     <div class="content-utilities">
                         <!-- <div class="page-nav">
