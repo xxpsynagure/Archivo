@@ -305,10 +305,10 @@ def StudentFilePage(request, SubjectCode):
         SubjectCode = str(SubjectCode)
         cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
         data = {items[0]: items[0] for items in cur}
-        cur.execute(f"select filename, Uploaded from file where repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}'; ")
-        filedata = {items[0]: items[1] for items in cur}
+        cur.execute(f"select f.filename, f.Uploaded,r.Reponame from file f ,Repository r where f.repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}' AND f.Repoid = r.Repoid; ")
+        filedata = {items[0]: {'time':items[1], 'repo':items[2]} for items in cur}
         print(filedata)
-        return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata})
+        return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata, 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
     
     try:
         FileName = request.POST.get("FileName")
@@ -344,9 +344,9 @@ def TeacherFilePage(request, ClassName):
         cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
         data = {items[0]: items[0] for items in cur}
         # print(data)
-        cur.execute(f"select filename,Uploaded from file where repoid in (select repoid from repository where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}'); ")
-        filedata = {items[0]: items[1] for items in cur}
-        return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata})
+        cur.execute(f"select f.filename,f.Uploaded,r.Reponame from file f, repository r where f.repoid in (select rr.repoid from repository rr where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; ")
+        filedata = {items[0]: {'time':items[1], 'repo':items[2]} for items in cur}
+        return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata, 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
 
     try:
         RepoName = request.POST.get('AssignmentName')
@@ -400,7 +400,9 @@ def downloadFile(request):
         with open('tmp/'+msg, "w") as wf:
             wf.write(data[2:-1].replace("_","'"))
 
-        return redirect('TeacherFilePage', request.META['HTTP_REFERER'][22:].split('/')[1])
+        redi = [items for items in request.META['HTTP_REFERER'][22:].split('/')]
+        print(redi)
+        return redirect(redi[0][:7]+'FilePage', redi[1])
 
 def deleteFile(request):
     if request.method == 'POST':
