@@ -52,5 +52,15 @@
 
 </div> 
 </section>
+{% if messages %}
+    {% for message in messages %}
+        <div id="msg" style="display: none;">{{message}}</div>
+    {% endfor %}
+{% endif %}
 
+<script>
+    
+    alert(document.getElementById("msg").textContent)
+
+</script>
 {% endblock %}

@@ -402,6 +402,7 @@ def downloadFile(request):
 
         redi = [items for items in request.META['HTTP_REFERER'][22:].split('/')]
         print(redi)
+        messages.success(request, "File downloaded succesfully \n Please check in `/tmp` folder " )
         return redirect(redi[0][:7]+'FilePage', redi[1])
 
 def deleteFile(request):
@@ -414,5 +415,5 @@ def deleteFile(request):
         cur = connections['default'].cursor()
         cur.execute(f"delete from file where Filename = '{msg}'")
         
-
+        messages.success(request, "File deleted succesfully")
         return redirect('StudentFilePage', request.META['HTTP_REFERER'][22:].split('/')[1])

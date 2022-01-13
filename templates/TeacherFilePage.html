@@ -171,24 +171,32 @@
         </section>
     </div>
 </div>
+{% if messages %}
+    {% for message in messages %}
+        <div id="msg" style="display: none;">{{message}}</div>
+    {% endfor %}
+{% endif %}
+
 
 <script>
-    async function downloadFile() {
-        console.log(document.getElementById('downloadButton').value)
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        res = await fetch('/downloadFile',{
-        method:'POST',
-        headers:{
-            'content-type':'application/json',
-            'X-CSRFToken': csrftoken
-        },
-        body:JSON.stringify({
-            name: document.getElementById('downloadButton').value
-        })
-    })
-    data = await res.json()
-    console.log(data)
-    }
+    alert(document.getElementById("msg").textContent)
+
+    // async function downloadFile() {
+    //     console.log(document.getElementById('downloadButton').value)
+    //     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    //     res = await fetch('/downloadFile',{
+    //     method:'POST',
+    //     headers:{
+    //         'content-type':'application/json',
+    //         'X-CSRFToken': csrftoken
+    //     },
+    //     body:JSON.stringify({
+    //         name: document.getElementById('downloadButton').value
+    //     })
+    // })
+    // data = await res.json()
+    // console.log(data)
+    // }
 
 </script>
 {% endblock %}

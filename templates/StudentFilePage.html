@@ -32,7 +32,7 @@
                         </ul>
                     </nav>
                 </div> -->
-
+                    
                 <div class="content-panel">
                     <div class="content-header-wrapper">
                         <h2 class="title">{{SubjectName}}</h2>
@@ -65,13 +65,13 @@
                                     <!-- </ul> -->
                                 </select>
                             </div>
-                            <div class="btn-group">
-                                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"><i class="fa fa-filter"></i> Sorting <span class="caret"></span></button>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">Newest first</a></li>
-                                    <li><a href="#">Oldest first</a></li>
-                                </ul>
-                            </div>
+                            <!-- {% if messages %}
+                                {% for message in messages %}
+                                <div class="btn-group">
+                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"><i class="fa fa-filter"></i> {{message}} <span class="caret"></span></button>
+                                </div>
+                                {% endfor %}
+                            {% endif %} -->
                             <!-- <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh"></i></button>
                                 <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Archive"><i class="fa fa-archive"></i></button>
@@ -139,10 +139,17 @@
         </section>
     </div>
 </div>
-{% endblock %}
 
-<!-- <script>
-    document.getElementById("fileInput").onchange = function() {
-    document.getElementById("form-control").submit();
-};
-</script> -->
+{% if messages %}
+    {% for message in messages %}
+        <div id="msg" style="display: none;">{{message}}</div>
+    {% endfor %}
+{% endif %}
+
+<script>
+    
+    alert(document.getElementById("msg").textContent)
+
+</script>
+
+{% endblock %}
