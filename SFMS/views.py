@@ -214,7 +214,7 @@ def StudentProfile(request):
             
         return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
                                                         'usn':data[0], 'Fname':data[1], 'Lname':data[2], 'Branch':data[10], 'Sem':data[11], 'Sec':data[12],
-                                                        'DOB':data[4], 'Email':data[5], 'Phno':data[6], 'Portfolio_links':data[8], 'About':data[9]})
+                                                        'DOB':str(data[4]), 'Email':data[5], 'Phno':data[6], 'Portfolio_links':data[8], 'About':data[9]})
     try:
         usn = request.POST.get("usn")
         Fname = request.POST.get("Fname")
