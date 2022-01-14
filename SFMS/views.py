@@ -302,7 +302,7 @@ def TeacherProfile(request):
 
 def StudentFilePage(request, SubjectCode):
     if request.method != "POST":
-        if len(SubjectCode) != 6:
+        if len(SubjectCode) > 7:
             raise Http404
         cur = connections['default'].cursor()
         SubjectCode = str(SubjectCode)
