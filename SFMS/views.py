@@ -1,7 +1,8 @@
+from email.policy import default
 from django.db.models.fields import EmailField
 from django.db.utils import DataError, DatabaseError, IntegrityError
 from django.shortcuts import redirect, render
-from django.http import HttpResponse, request, response
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, request, response
 from django.contrib import messages
 from SFMS import models
 from django.db import connections
@@ -301,6 +302,8 @@ def TeacherProfile(request):
 
 def StudentFilePage(request, SubjectCode):
     if request.method != "POST":
+        if len(SubjectCode) != 6:
+            raise Http404
         cur = connections['default'].cursor()
         SubjectCode = str(SubjectCode)
         cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
@@ -340,6 +343,8 @@ def StudentFilePage(request, SubjectCode):
 
 def TeacherFilePage(request, ClassName):
     if request.method != "POST":
+        if len(ClassName) != 6:
+            raise Http404
         cur = connections['default'].cursor()
         cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
         data = {items[0]: items[0] for items in cur}
@@ -376,7 +381,7 @@ def notifications(request):
         dict['title'] = tuple[5]
         dict['content'] = tuple[6]
         data.append(dict)
-    print(data)
+    # print(data)
 
     return render(request, "notifications.html",{'username':greeting()}|{'message':data})
 
