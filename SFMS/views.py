@@ -1,4 +1,6 @@
 from email.policy import default
+import mimetypes
+from django.conf import settings
 from django.db.models.fields import EmailField
 from django.db.utils import DataError, DatabaseError, IntegrityError
 from django.shortcuts import redirect, render
@@ -323,18 +325,18 @@ def StudentFilePage(request, SubjectCode):
         return redirect('#')
 
     print(FileName.split('\\')[-1], RepoName, USN, type(File))
-    FileName = FileName.split('\\')[-1]
-    # path = default_storage.save('tmp/'+FileName, ContentFile(File.read())) # Downloading the file
-    print(File.content_type)
-    uploadFile = str(File.read())
-    # with open(uploadFile,"wb") as f:
-    #     f.replace("'","_")
-    # print(type(uploadFile))
-    uploadFile = uploadFile.replace("'","_")
+    FileName = USN +' - ' + FileName.split('\\')[-1]
+    path = default_storage.save(USN+'/'+FileName, ContentFile(File.read())) # Downloading the file
+    # print(File.content_type)
+    # uploadFile = str(File.read())
+    # # with open(uploadFile,"wb") as f:
+    # #     f.replace("'","_")
+    # # print(type(uploadFile))
+    # uploadFile = uploadFile.replace("'","_")
     cur = connections['default'].cursor()
-    cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Content) VALUES 
+    cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn) VALUES 
                     ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}' AND Class = (SELECT Class FROM STUDENT WHERE USN = '{USN}') ), 
-                    '{FileName}', '{USN}', '{uploadFile}')
+                    '{FileName}', '{USN}')
                     """)
     cur.execute(f"SELECT Filename,Content from file where Usn = '{USN}'")
     file = cur.fetchone()
@@ -393,22 +395,33 @@ def downloadFile(request):
         # return HttpResponse(json.dumps({'received':msg}))
 
         msg = request.POST.get('downloadButton')
-        cur = connections['default'].cursor()
-        cur.execute(f"SELECT Content from file where Filename = '{msg}'")
-        data = cur.fetchone()
-        # print(data[0])
-        with open('tmp/'+msg, 'wb') as writefile:
-            writefile.write(data[0])
+        # cur = connections['default'].cursor()
+        # cur.execute(f"SELECT Content from file where Filename = '{msg}'")
+        # data = cur.fetchone()
+        # # print(data[0])
+        # with open('tmp/'+msg, 'wb') as writefile:
+        #     writefile.write(data[0])
 
-        with open('tmp/'+msg, 'r') as f:
-            data = f.read()
-        with open('tmp/'+msg, "w") as wf:
-            wf.write(data[2:-1].replace("_","'"))
+        # with open('tmp/'+msg, 'r') as f:
+        #     data = f.read()
+        # with open('tmp/'+msg, "w") as wf:
+        #     wf.write(data[2:-1].replace("_","'"))
 
-        redi = [items for items in request.META['HTTP_REFERER'][22:].split('/')]
-        print(redi)
-        messages.success(request, "File downloaded succesfully \n Please check in `/tmp` folder " )
-        return redirect(redi[0][:7]+'FilePage', redi[1])
+        # redi = [items for items in request.META['HTTP_REFERER'][22:].split('/')]
+        # print(redi)
+        # messages.success(request, "File downloaded succesfully \n Please check in `/tmp` folder " )
+        # return redirect(redi[0][:7]+'FilePage', redi[1])
+        pre,suf = msg.split(' - ')
+
+        path = open(settings.MEDIA_ROOT+'/'+pre+'/'+msg, 'rb')
+    # Set the mime type
+        mime_type, _ = mimetypes.guess_type(settings.MEDIA_ROOT+'/'+USN+'/'+msg)
+    # Set the return value of the HttpResponse
+        response = HttpResponse(path, content_type=mime_type)
+    # Set the HTTP header for sending to browser
+        response['Content-Disposition'] = "attachment; filename=%s" % msg
+    # Return the response value
+        return response
 
 def deleteFile(request):
     if request.method == 'POST':

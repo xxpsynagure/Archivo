@@ -99,8 +99,10 @@
                                         <form action="/deleteFile" method="post">{%csrf_token%}
                                             <button value="{{key}}" id="deleteButton" name="deleteButton" ><i class="fa fa-trash"></i></a></button>
                                         </form><br>
-                                        <form action="/downloadFile" method="post">{%csrf_token%}
-                                            <button value="{{key}}" id="downloadButton" name="downloadButton" ><i class="fa fa-download"></i></a></button>
+                                        <form action="{% url 'downloadFile' %}" method="post">{%csrf_token%}
+                                      
+                                            <button value="{{key}}" id="downloadButton" name="downloadButton" ><i class="fa fa-download"></i></button>
+                                            <!-- </a> -->
                                         </form>
                                     </ul>
                                 </div>
