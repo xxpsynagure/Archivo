@@ -1,10 +1,12 @@
 from email.policy import default
+from fileinput import filename
 import mimetypes
+import os
 from django.conf import settings
 from django.db.models.fields import EmailField
 from django.db.utils import DataError, DatabaseError, IntegrityError
 from django.shortcuts import redirect, render
-from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, request, response
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseRedirect, request, response
 from django.contrib import messages
 from SFMS import models
 from django.db import connections
@@ -68,82 +70,80 @@ def error_404(request,exception):
     return render(request, "404.html")
 
 def doLogin(request):
-    if(request.method!='POST'):
+    if (request.method!='POST'):
         return HttpResponse('<h2>Method Not Allowed</h2>')
-    else:
-        try:
-            user = request.POST.get("your_username")
-            password = request.POST.get("your_pass")
-        except ObjectDoesNotExist as e:
-            print(e)
-            messages.warning(request, e.args)
-            return redirect('Login')
-        try:
-            cur = connections['default'].cursor()
-            p = cur.execute(f"SELECT * FROM Registration WHERE Username = '{user}' AND  Pass = md5('{password}');")
-        except DatabaseError or DataError as e:
-            print(e)
-            messages.warning(request, "Cannot connect to Database, \n Please try again later")
-            return redirect('Login')
+    try:
+        user = request.POST.get("your_username")
+        password = request.POST.get("your_pass")
+    except ObjectDoesNotExist as e:
+        print(e)
+        messages.warning(request, e.args)
+        return redirect('Login')
+    try:
+        cur = connections['default'].cursor()
+        p = cur.execute(f"SELECT * FROM Registration WHERE Username = '{user}' AND  Pass = md5('{password}');")
+    except DatabaseError or DataError as e:
+        print(e)
+        messages.warning(request, "Cannot connect to Database, \n Please try again later")
+        return redirect('Login')
 
-        if(p):
-            messages.success(request, "Login successful")
-            data = cur.fetchall()
-            global USN
-            USN=data[0][0]
-            if(data[0][6]=='S'):
-                print(USN)
-                return redirect("StudentDashboard")
-            return redirect("TeacherDashboard")
-        else:
-            messages.error(request, "Username or Password not matching, Please try again")
-            return redirect('Login')
+    if(p):
+        messages.success(request, "Login successful")
+        data = cur.fetchall()
+        global USN
+        USN=data[0][0]
+        if(data[0][6]=='S'):
+            print(USN)
+            return redirect("StudentDashboard")
+        return redirect("TeacherDashboard")
+    else:
+        messages.error(request, "Username or Password not matching, Please try again")
+        return redirect('Login')
 
 def doReg(request):
-    if(request.method!='POST'):
+    if (request.method!='POST'):
         return HttpResponse('<h2>Method Not Allowed</h2>')
-    else:
+    try:
+        user = request.POST.get("username")
+        usn = request.POST.get("usn")
+        email =request.POST.get("email")
+        college =request.POST.get("college")
+        branch =request.POST.get("branch")
+        passw = request.POST.get("pass")
+        re_pass =request.POST.get("re_pass")       
+        T_or_S = 'T' if (request.META['HTTP_REFERER'][22:]) == 'TeacherReg/' else 'S'
+    except ObjectDoesNotExist as e:
+        print(e)
+        messages.warning(request, "Form not filled, \n Please check again")
+        return redirect('/#Error')
+
+    if(passw==re_pass):
         try:
-            user = request.POST.get("username")
-            usn = request.POST.get("usn")
-            email =request.POST.get("email")
-            college =request.POST.get("college")
-            branch =request.POST.get("branch")
-            passw = request.POST.get("pass")
-            re_pass =request.POST.get("re_pass")       
-            T_or_S = 'T' if (request.META['HTTP_REFERER'][22:]) == 'TeacherReg/' else 'S'
-        except ObjectDoesNotExist as e:
+            cursor = connections['default'].cursor()
+        except DatabaseError as e:
             print(e)
-            messages.warning(request, "Form not filled, \n Please check again")
+            messages.warning(request, "Cannot connect to Database \n Please try again later")
             return redirect('/#Error')
-
-        if(passw==re_pass):
-            try:
-                cursor = connections['default'].cursor()
-            except DatabaseError as e:
-                print(e)
-                messages.warning(request, "Cannot connect to Database \n Please try again later")
-                return redirect('/#Error')
-            try:
-                cursor.execute(f"INSERT INTO Registration VALUES('{usn}','{user}','{email}',md5('{passw}'),'{branch}','{college}', '{T_or_S}');")
-            except IntegrityError as e:
-                print(e)
-                refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Please fill in details"}
-                messages.warning(request, refer[str(e.args).split('.')[-1][:-3]])
-                return redirect(request.META['HTTP_REFERER'][22:])
-
-            messages.success(request, "Registration Succesful")
-            global USN
-            USN = usn
-            print(USN)
-            if T_or_S == 'S':
-                return redirect('StudentProfile')
-            else:
-                return redirect('TeacherProfile')
-                
-        else:
-            messages.error(request, "Password not matching, Please Try again")
+        try:
+            cursor.execute(f"INSERT INTO Registration VALUES('{usn}','{user}','{email}',md5('{passw}'),'{branch}','{college}', '{T_or_S}');")
+        except IntegrityError as e:
+            print(e)
+            refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Please fill in details"}
+            messages.warning(request, refer[str(e.args).split('.')[-1][:-3]])
             return redirect(request.META['HTTP_REFERER'][22:])
+
+        messages.success(request, "Registration Succesful")
+        global USN
+        USN = usn
+        print(USN)
+        if T_or_S == 'S':
+            return redirect('StudentProfile')
+        else:
+            return redirect('TeacherProfile')
+
+    else:
+        messages.error(request, "Password not matching, Please Try again")
+        return redirect(request.META['HTTP_REFERER'][22:])
 
 def greeting():
     cur = connections['default'].cursor() 
@@ -165,9 +165,7 @@ def trial(request): #trial purpose
 def StudentDashboard(request):
     cur = connections['default'].cursor()
     cur.execute(f"SELECT S.Subject_code, S.Subject_name FROM Subject S WHERE S.Class = (SELECT Class FROM Student WHERE usn = '{USN}')")
-    data ={}
-    for items in cur:
-        data[items[0]] = items[1]
+    data = {items[0]: items[1] for items in cur}
     print(data)
     return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
 
@@ -310,8 +308,8 @@ def StudentFilePage(request, SubjectCode):
         SubjectCode = str(SubjectCode)
         cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
         data = {items[0]: items[0] for items in cur}
-        cur.execute(f"select f.filename, f.Uploaded,r.Reponame from file f ,Repository r where f.repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}' AND f.Repoid = r.Repoid; ")
-        filedata = {items[0]: {'time':items[1], 'repo':items[2]} for items in cur}
+        cur.execute(f"select f.filename, f.Uploaded,r.Reponame, f.Usn from file f ,Repository r where f.repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}' AND f.Repoid = r.Repoid; ")
+        filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3]} for items in cur}
         print(filedata)
         return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata, 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
     
@@ -325,8 +323,10 @@ def StudentFilePage(request, SubjectCode):
         return redirect('#')
 
     print(FileName.split('\\')[-1], RepoName, USN, type(File))
-    FileName = USN +' - ' + FileName.split('\\')[-1]
-    path = default_storage.save(USN+'/'+FileName, ContentFile(File.read())) # Downloading the file
+    FileName = FileName.split('\\')[-1]
+    FileLocation = USN+'/'+FileName
+    path = default_storage.save(FileLocation, ContentFile(File.read())) # Downloading the file
+    print(path)
     # print(File.content_type)
     # uploadFile = str(File.read())
     # # with open(uploadFile,"wb") as f:
@@ -334,12 +334,12 @@ def StudentFilePage(request, SubjectCode):
     # # print(type(uploadFile))
     # uploadFile = uploadFile.replace("'","_")
     cur = connections['default'].cursor()
-    cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn) VALUES 
+    cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Location) VALUES 
                     ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}' AND Class = (SELECT Class FROM STUDENT WHERE USN = '{USN}') ), 
-                    '{FileName}', '{USN}')
+                    '{FileName}', '{USN}', '{FileLocation}')
                     """)
-    cur.execute(f"SELECT Filename,Content from file where Usn = '{USN}'")
-    file = cur.fetchone()
+    # cur.execute(f"SELECT Filename,Content from file where Usn = '{USN}'")
+    # file = cur.fetchone()
 
     return redirect('StudentFilePage', SubjectCode)
 
@@ -351,8 +351,8 @@ def TeacherFilePage(request, ClassName):
         cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
         data = {items[0]: items[0] for items in cur}
         # print(data)
-        cur.execute(f"select f.filename,f.Uploaded,r.Reponame from file f, repository r where f.repoid in (select rr.repoid from repository rr where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; ")
-        filedata = {items[0]: {'time':items[1], 'repo':items[2]} for items in cur}
+        cur.execute(f"select f.filename,f.Uploaded,r.Reponame,f.Usn from file f, repository r where f.repoid in (select rr.repoid from repository rr where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; ")
+        filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3]} for items in cur}
         return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata, 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
 
     try:
@@ -412,11 +412,11 @@ def downloadFile(request):
         # print(redi)
         # messages.success(request, "File downloaded succesfully \n Please check in `/tmp` folder " )
         # return redirect(redi[0][:7]+'FilePage', redi[1])
-        pre,suf = msg.split(' - ')
 
-        path = open(settings.MEDIA_ROOT+'/'+pre+'/'+msg, 'rb')
+
+        path = open(settings.MEDIA_ROOT+'/'+msg, 'rb')
     # Set the mime type
-        mime_type, _ = mimetypes.guess_type(settings.MEDIA_ROOT+'/'+USN+'/'+msg)
+        mime_type, _ = mimetypes.guess_type(settings.MEDIA_ROOT+'/'+msg)
     # Set the return value of the HttpResponse
         response = HttpResponse(path, content_type=mime_type)
     # Set the HTTP header for sending to browser
@@ -429,10 +429,14 @@ def deleteFile(request):
         # msg = json.loads(request.body)
         # print(msg)
         # return HttpResponse(json.dumps({'received':msg}))
-
         msg = request.POST.get('deleteButton')
+        msg = msg.split('/')
+
         cur = connections['default'].cursor()
-        cur.execute(f"delete from file where Filename = '{msg}'")
+        cur.execute(f"delete from file where Filename = '{msg[1]}' and Usn = '{msg[0]}'")
         
+        if os.path.isfile(settings.MEDIA_ROOT+'/'+'/'.join(msg)):
+            os.remove(settings.MEDIA_ROOT+'/'+'/'.join(msg))
+
         messages.success(request, "File deleted succesfully")
-        return redirect('StudentFilePage', request.META['HTTP_REFERER'][22:].split('/')[1])
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

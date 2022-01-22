@@ -120,18 +120,18 @@
                     <div class="drive-wrapper drive-grid-view">
                         <div class="grid-items-wrapper">
                             <!-- start the for loop from here for file tiles -->
-                            {% for key in filedata.keys %}
+                            {% for key,values in filedata.items %}
                             <div class="drive-item module text-center">
                                 <div class="drive-item-inner module-inner">
-                                    <div class="drive-item-title"><a href="#">{{key}}</a></div>
+                                    <div class="drive-item-title">{{key}}<br>{{values.by}}</div>
                                     <div class="drive-item-thumb">
                                         <a href="#"><i class="fa fa-file"></i></a>
                                     </div>
                                 </div>
                                 <div class="drive-item-footer module-footer">
-                                    <form action="/downloadFile" method="post">{%csrf_token%}
+                                    <form action="{% url 'downloadFile' %}" method="post">{%csrf_token%}
                                         <ul class="utilities list-inline">
-                                            <button value="{{key}}" id="downloadButton" name="downloadButton" ><i class="fa fa-download"></i></a></button>
+                                            <button value="{{values.by}}/{{key}}" id="downloadButton" name="downloadButton" ><i class="fa fa-download"></i></a></button>
                                             <!-- <button><a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="fa fa-trash"></i></a></button> -->
                                         </ul>
                                     </form>
@@ -158,7 +158,7 @@
                                     {% for key, value in filedata.items %}
                                     <tr>
                                         <td class="type"><i class="fa fa-file-text-o text-primary"></i></td>
-                                        <td class="name truncate"><a href="#">{{key}}</a></td>
+                                        <td class="name truncate"><a href="#">{{key}} - from {{value.by}}</a></td>
                                         <td class="date">{{value.time|date:"d M Y"}}</td>
                                         <td class="size">{{value.time|time:"TIME_FORMAT"}}</td>
                                         <td class="repo">{{value.repo}}</td>
