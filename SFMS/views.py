@@ -333,11 +333,16 @@ def StudentFilePage(request, SubjectCode):
     # #     f.replace("'","_")
     # # print(type(uploadFile))
     # uploadFile = uploadFile.replace("'","_")
-    cur = connections['default'].cursor()
-    cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Location) VALUES 
-                    ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}' AND Class = (SELECT Class FROM STUDENT WHERE USN = '{USN}') ), 
-                    '{FileName}', '{USN}', '{FileLocation}')
-                    """)
+    try:
+        cur = connections['default'].cursor()
+        cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Location) VALUES 
+                        ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}' AND Class = (SELECT Class FROM STUDENT WHERE USN = '{USN}') ), 
+                        '{FileName}', '{USN}', '{FileLocation}')
+                        """)
+    except IntegrityError as e:
+        print(e)
+        messages.error(request, "Please select the Assignment repository before uploading the file")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     # cur.execute(f"SELECT Filename,Content from file where Usn = '{USN}'")
     # file = cur.fetchone()
 
