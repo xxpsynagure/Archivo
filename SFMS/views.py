@@ -345,7 +345,7 @@ def StudentFilePage(request, SubjectCode):
 
 def TeacherFilePage(request, ClassName):
     if request.method != "POST":
-        if len(ClassName) != 6:
+        if len(ClassName) > 6:
             raise Http404
         cur = connections['default'].cursor()
         cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
@@ -366,6 +366,7 @@ def TeacherFilePage(request, ClassName):
     print(Repoid, RepoName, USN, ClassName, )
     cur = connections['default'].cursor()
     cur.execute(f"INSERT INTO Repository VALUES ('{Repoid}', '{RepoName}', '{USN}', '{ClassName}', ( SELECT Subject_code FROM Subject WHERE ssid = '{USN}' and Class = '{ClassName}') )")
+    ClassName = ClassName[:3]+'-'+ClassName[3:]
     return redirect('TeacherFilePage', ClassName)
 
 def notifications(request):
