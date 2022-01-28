@@ -2,6 +2,7 @@ from email.policy import default
 from fileinput import filename
 import mimetypes
 import os
+from webbrowser import Opera
 from django.conf import settings
 from django.db.models.fields import EmailField
 from django.db.utils import DataError, DatabaseError, IntegrityError
@@ -9,7 +10,7 @@ from django.shortcuts import redirect, render
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseRedirect, request, response
 from django.contrib import messages
 from SFMS import models
-from django.db import connections
+from django.db import OperationalError, connections
 from django.core.exceptions import *
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -27,12 +28,20 @@ def Login(request):
 def StudentReg(request):
     try:
         cur = connections['default'].cursor()
-        cur.execute(f"SELECT * FROM College ")
+        try:
+            cur.execute(f"SELECT * FROM College ")
+        except (IntegrityError,OperationalError) as e:
+            print(e)
+            messages.warning(request, 'Cannot fetch colleges')
         params ={}
         for item in cur:
             params[item[0]]=item[1]
 
-        cur.execute(f"SELECT * FROM Branch")
+        try:
+            cur.execute(f"SELECT * FROM Branch")
+        except (IntegrityError,OperationalError) as e:
+            print(e)
+            messages.warning(request, "Cannot fetch branches")
         branch = {}
         colli = []
         for item in cur:
@@ -43,16 +52,24 @@ def StudentReg(request):
     except DatabaseError or DataError as e:
         print(e.args)
         messages.warning(request, "Cannot connect to Database \n Please Try again later")
-        return redirect('/#Error')
+        raise Http404
 
 def TeacherReg(request):
     try:
         cur = connections['default'].cursor()
-        cur.execute(f"SELECT * FROM College ")
+        try:
+            cur.execute(f"SELECT * FROM College ")
+        except (IntegrityError,OperationalError) as e:
+            print(e)
+            messages.warning(request, "Cannot fetch colleges")
         params ={}
         for item in cur:
             params[item[0]]=item[1]
-        cur.execute(f"SELECT * FROM Branch")
+        try:
+            cur.execute(f"SELECT * FROM Branch")
+        except (IntegrityError,OperationalError) as e:
+            print(e)
+            messages.warning(request, "Cannot fetch branches")
         branch = {}
         colli = []
         for item in cur:
@@ -63,7 +80,7 @@ def TeacherReg(request):
     except DatabaseError or DataError as e:
         print(e.args)
         messages.warning(request, "Cannot connect to Database \n Please try again later")
-        return redirect('/#Error')
+        raise Http404
 
 
 def error_404(request,exception):
@@ -71,7 +88,7 @@ def error_404(request,exception):
 
 def doLogin(request):
     if (request.method!='POST'):
-        return HttpResponse('<h2>Method Not Allowed</h2>')
+        raise Http404
     try:
         user = request.POST.get("your_username")
         password = request.POST.get("your_pass")
@@ -82,7 +99,7 @@ def doLogin(request):
     try:
         cur = connections['default'].cursor()
         p = cur.execute(f"SELECT * FROM Registration WHERE Username = '{user}' AND  Pass = md5('{password}');")
-    except DatabaseError or DataError as e:
+    except (DatabaseError,DataError,IntegrityError) as e:
         print(e)
         messages.warning(request, "Cannot connect to Database, \n Please try again later")
         return redirect('Login')
@@ -102,7 +119,7 @@ def doLogin(request):
 
 def doReg(request):
     if (request.method!='POST'):
-        return HttpResponse('<h2>Method Not Allowed</h2>')
+        raise Http404
     try:
         user = request.POST.get("username")
         usn = request.POST.get("usn")
@@ -115,7 +132,7 @@ def doReg(request):
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
-        return redirect('/#Error')
+        raise Http404
 
     if(passw==re_pass):
         try:
@@ -126,7 +143,7 @@ def doReg(request):
             return redirect('/#Error')
         try:
             cursor.execute(f"INSERT INTO Registration VALUES('{usn}','{user}','{email}',md5('{passw}'),'{branch}','{college}', '{T_or_S}');")
-        except IntegrityError as e:
+        except IntegrityError or OperationalError as e:
             print(e)
             refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Please fill in details"}
             messages.warning(request, refer[str(e.args).split('.')[-1][:-3]])
@@ -148,7 +165,12 @@ def doReg(request):
 def greeting():
     cur = connections['default'].cursor() 
     print(USN)
-    cur.execute(f"CALL greetings('{USN}')")
+    try:
+        cur.execute(f"CALL greetings('{USN}')")
+    except (IntegrityError, OperationalError) as e:
+        print(e)
+        messages.warning(request, "Error in greeting , So exiting")
+        return redirect('/')
     data = cur.fetchone()
     return data[0]
 
@@ -163,15 +185,29 @@ def trial(request): #trial purpose
     return render(request, "TeacherFilePage.html")
 
 def StudentDashboard(request):
-    cur = connections['default'].cursor()
-    cur.execute(f"SELECT S.Subject_code, S.Subject_name FROM Subject S WHERE S.Class = (SELECT Class FROM Student WHERE usn = '{USN}')")
+    try:
+        cur = connections['default'].cursor()
+    except DatabaseError as e:
+        print(e)
+        messages.warning(request, "Cannot connect to Database \n Please try again later")
+        return redirect('Login')
+    try:
+        cur.execute(f"SELECT S.Subject_code, S.Subject_name FROM Subject S WHERE S.Class = (SELECT Class FROM Student WHERE usn = '{USN}')")
+    except IntegrityError or OperationalError as e:
+        print(e)
+        messages.warning(request, "Internal error in fetching subjects")
+        return redirect('Login')
     data = {items[0]: items[1] for items in cur}
     print(data)
     return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
 
 def TeacherDashboard(request): 
     cur=connections['default'].cursor()
-    cur.execute(f"SELECT C.Branch, C.Sem, C.Sec, S.Subject_code, S.Subject_name FROM Subject S, Class C WHERE ssid = '{USN}' AND S.Class = C.Class")
+    try:
+        cur.execute(f"SELECT C.Branch, C.Sem, C.Sec, S.Subject_code, S.Subject_name FROM Subject S, Class C WHERE ssid = '{USN}' AND S.Class = C.Class")
+    except (IntegrityError, OperationalError) as e:
+        print(e)
+        messages.warning(request, "Could not fetch Subjects")
     
     data ={}
     for item in cur:
@@ -202,12 +238,20 @@ def TeacherDashboard(request):
 def StudentProfile(request):
     if(request.method!='POST'):
         cur = connections['default'].cursor()
-        cur.execute(f"SELECT S.*, C.Branch, C.Sem, C.Sec FROM Student S, Class C WHERE USN = '{USN}' and S.Class = C.Class")
+        try:
+            cur.execute(f"SELECT S.*, C.Branch, C.Sem, C.Sec FROM Student S, Class C WHERE USN = '{USN}' and S.Class = C.Class")
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.error(request, "Cannot fetch the profile data from database")
         data = cur.fetchone()
         print(data)
         if data is None:
             cur = connections['default'].cursor()
-            cur.execute(f"SELECT * FROM Registration WHERE usn_ssid = '{USN}'")
+            try:
+                cur.execute(f"SELECT * FROM Registration WHERE usn_ssid = '{USN}'")
+            except (IntegrityError, OperationalError) as e:
+                print(e)
+                messages.warning(request, "Cannot fetch profile data from Registration table of database")
             data = cur.fetchone()
             return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
                                                         'usn':data[0], 'Fname':'', 'Lname':'', 'Branch':data[4], 'Sem':'', 'Sec':'',
@@ -247,20 +291,28 @@ def StudentProfile(request):
         return redirect('/#Error')
     try:
         cursor.execute(f"INSERT INTO Student VALUES('{usn}','{Fname}','{Lname}','{Class}','{DOB}', '{Email}', '{Phno}', '{Image}', '{Portfolio_links}', '{About}') ON DUPLICATE KEY UPDATE usn = '{usn}', Fname='{Fname}', Lname='{Lname}', Class='{Class}', DOB='{DOB}', Email='{Email}', Phno='{Phno}', Image='{Image}', Portfolio_links='{Portfolio_links}', About='{About}';")
-    except IntegrityError as e:
+    except (IntegrityError, OperationalError) as e:
         print(e)
-        messages.error(request,e)
+        messages.error(request,e.args)
     messages.success(request, "Saved Succesfully")
     return redirect('StudentDashboard')
 
 def TeacherProfile(request):
     if(request.method!='POST'):
         cur = connections['default'].cursor()
-        cur.execute(f"SELECT * FROM Teacher WHERE SSID = '{USN}'")
+        try:
+            cur.execute(f"SELECT * FROM Teacher WHERE SSID = '{USN}'")
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.error(request, e.args)
         data = cur.fetchone()
         if data is None:
             cur = connections['default'].cursor()
-            cur.execute(f"SELECT * FROM Registration WHERE usn_ssid = '{USN}'")
+            try:
+                cur.execute(f"SELECT * FROM Registration WHERE usn_ssid = '{USN}'")
+            except (IntegrityError, OperationalError) as e:
+                print(e)
+                messages.error(request, e.args)
             data = cur.fetchone()
             return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':'', 'Lname':'',
                                                         'Designation':'', 'Department':data[4], 'yr_of_exp':'', 'Email':data[2], 'Phno':'', 'Skills':''})
@@ -293,7 +345,7 @@ def TeacherProfile(request):
         return redirect('/#Error')
     try:
         cursor.execute(f"INSERT INTO Teacher VALUES('{ssid}','{Fname}','{Lname}','{Designation}','{Department}','{yr_of_exp}', '{Email}', '{Phno}', '{Skills}', '{Image}') ON DUPLICATE KEY UPDATE SSID='{ssid}', Fname='{Fname}', Lname='{Lname}', Designation='{Designation}', Department='{Department}', yr_of_exp='{yr_of_exp}', Email='{Email}', Phno='{Phno}',Skills='{Skills}', Image='{Image}';")
-    except IntegrityError as e:
+    except (IntegrityError,OperationalError) as e:
         print(e)
         messages.error(request, e.args)
     messages.success(request, "Saved sucessfully")
@@ -306,9 +358,17 @@ def StudentFilePage(request, SubjectCode):
             raise Http404
         cur = connections['default'].cursor()
         SubjectCode = str(SubjectCode)
-        cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
+        try:
+            cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.error(request, e.args)
         data = {items[0]: items[0] for items in cur}
-        cur.execute(f"select f.filename, f.Uploaded,r.Reponame, f.Usn from file f ,Repository r where f.repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}' AND f.Repoid = r.Repoid; ")
+        try:
+            cur.execute(f"select f.filename, f.Uploaded,r.Reponame, f.Usn from file f ,Repository r where f.repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}' AND f.Repoid = r.Repoid; ")
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.error(request, e.args)
         filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3]} for items in cur}
         print(filedata)
         return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata, 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
@@ -339,7 +399,7 @@ def StudentFilePage(request, SubjectCode):
                         ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}' AND Class = (SELECT Class FROM STUDENT WHERE USN = '{USN}') ), 
                         '{FileName}', '{USN}', '{FileLocation}')
                         """)
-    except IntegrityError as e:
+    except (IntegrityError,OperationalError) as e:
         print(e)
         messages.error(request, "Please select the Assignment repository before uploading the file")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
@@ -353,10 +413,18 @@ def TeacherFilePage(request, ClassName):
         if len(ClassName) > 6:
             raise Http404
         cur = connections['default'].cursor()
-        cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
+        try:
+            cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.error(request, e.args)
         data = {items[0]: items[0] for items in cur}
         # print(data)
-        cur.execute(f"select f.filename,f.Uploaded,r.Reponame,f.Usn from file f, repository r where f.repoid in (select rr.repoid from repository rr where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; ")
+        try:
+            cur.execute(f"select f.filename,f.Uploaded,r.Reponame,f.Usn from file f, repository r where f.repoid in (select rr.repoid from repository rr where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; ")
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.error(request, e.args)
         filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3]} for items in cur}
         return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata, 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
 
@@ -370,15 +438,23 @@ def TeacherFilePage(request, ClassName):
     ClassName = ClassName.replace('-','')
     print(Repoid, RepoName, USN, ClassName, )
     cur = connections['default'].cursor()
-    cur.execute(f"INSERT INTO Repository VALUES ('{Repoid}', '{RepoName}', '{USN}', '{ClassName}', ( SELECT Subject_code FROM Subject WHERE ssid = '{USN}' and Class = '{ClassName}') )")
+    try:
+        cur.execute(f"INSERT INTO Repository VALUES ('{Repoid}', '{RepoName}', '{USN}', '{ClassName}', ( SELECT Subject_code FROM Subject WHERE ssid = '{USN}' and Class = '{ClassName}') )")
+    except (IntegrityError, OperationalError) as e:
+        print(e)
+        messages.warning(request, "Assignment Id already in use")
     ClassName = ClassName[:3]+'-'+ClassName[3:]
     return redirect('TeacherFilePage', ClassName)
 
 def notifications(request):
     cur = connections['default'].cursor()
-    cur.execute(f"""SELECT DISTINCT M.* FROM Message_recieved M
+    try:
+        cur.execute(f"""SELECT DISTINCT M.* FROM Message_recieved M
                     WHERE M.Class = (SELECT S.Class FROM Student S WHERE S.usn = '{USN}')
                     ORDER BY M.Sent_time DESC;""")
+    except (IntegrityError, OperationalError) as e:
+        print(e)
+        messages.warning(request, "Unable to update notification, please try again later.")
     #data = cur.fetchall()
     data=[]
     for tuple in cur.fetchall():
@@ -438,7 +514,11 @@ def deleteFile(request):
         msg = msg.split('/')
 
         cur = connections['default'].cursor()
-        cur.execute(f"delete from file where Filename = '{msg[1]}' and Usn = '{msg[0]}'")
+        try:
+            cur.execute(f"delete from file where Filename = '{msg[1]}' and Usn = '{msg[0]}'")
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.error(request, e.args)
         
         if os.path.isfile(settings.MEDIA_ROOT+'/'+'/'.join(msg)):
             os.remove(settings.MEDIA_ROOT+'/'+'/'.join(msg))

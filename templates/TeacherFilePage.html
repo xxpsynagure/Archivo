@@ -38,7 +38,7 @@
 
                 <div class="content-panel">
                     <div class="content-header-wrapper">
-                        <h2 class="title">{{ClassName}}</h2>
+                        <h2 class="title">{{SubjectName}}</h2>
                         <div class="actions">
                             <!-- Button trigger modal -->
 <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
@@ -64,7 +64,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="exampleInputPassword1">AssignmentID</label>
-                                            <input type="text" class="form-control" id="AssignmentID" name="AssignmentID" placeholder="SubjectCode-ClassName-A1">
+                                            <input type="text" class="form-control" id="AssignmentID" name="AssignmentID" placeholder="SubjectCode-ClassName-A1" value="{{SubjectName}}">
                                         </div>
                                         <button type="submit" class="btn btn-primary">Create</button>
                                         </form>
@@ -101,13 +101,13 @@
                                     <!-- </ul> -->
                                 </select>
                             </div>
-                            <div class="btn-group">
+                            <!-- <div class="btn-group">
                                 <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"><i class="fa fa-filter"></i> Sorting <span class="caret"></span></button>
                                 <ul class="dropdown-menu">
                                     <li><a href="#">Newest first</a></li>
                                     <li><a href="#">Oldest first</a></li>
                                 </ul>
-                            </div>
+                            </div> -->
                             <!-- <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh"></i></button>
                                 <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Archive"><i class="fa fa-archive"></i></button>
