@@ -467,7 +467,7 @@ def notifications(request):
         data.append(dict)
     # print(data)
 
-    return render(request, "notifications.html",{'username':greeting()}|{'message':data})
+    return render(request, "notifications.html",{'username':greeting()}|{'message':data,'url':'/StudentDashboard','Purl':'/StudentDashboard/StudentProfile'})
 
 
 def downloadFile(request):
