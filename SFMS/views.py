@@ -365,11 +365,11 @@ def StudentFilePage(request, SubjectCode):
             messages.error(request, e.args)
         data = {items[0]: items[0] for items in cur}
         try:
-            cur.execute(f"select f.filename, f.Uploaded,r.Reponame, f.Usn from file f ,Repository r where f.repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}' AND f.Repoid = r.Repoid; ")
+            cur.execute(f"select f.filename, f.Uploaded,r.Reponame, f.Usn, f.Marks from file f ,Repository r where f.repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}' AND f.Repoid = r.Repoid; ")
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
-        filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3]} for items in cur}
+        filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3], 'marks':items[4]} for items in cur}
         print(filedata)
         return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata, 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
     
@@ -421,11 +421,11 @@ def TeacherFilePage(request, ClassName):
         data = {items[0]: items[0] for items in cur}
         # print(data)
         try:
-            cur.execute(f"select f.filename,f.Uploaded,r.Reponame,f.Usn from file f, repository r where f.repoid in (select rr.repoid from repository rr where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; ")
+            cur.execute(f"select f.filename,f.Uploaded,r.Reponame,f.Usn,f.Marks from file f, repository r where f.repoid in (select rr.repoid from repository rr where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; ")
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
-        filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3]} for items in cur}
+        filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3], 'marks':items[4]} for items in cur}
         return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata, 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
 
     try:
@@ -475,8 +475,15 @@ def downloadFile(request):
         # msg = json.loads(request.body)
         # print(msg)
         # return HttpResponse(json.dumps({'received':msg}))
+        btn = request.POST.get('downloadButton')
+        msg = request.POST.get('downloadValue')
+        marks = request.POST.get("marks")
+        print(btn, msg, marks)
 
-        msg = request.POST.get('downloadButton')
+        if btn is None:
+            cur = connections['default'].cursor()
+            cur.execute(f"UPDATE File SET Marks = {marks} WHERE USN = '{msg.split('/')[0]}' AND Filename = '{msg.split('/')[1]}' ")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
         # cur = connections['default'].cursor()
         # cur.execute(f"SELECT Content from file where Filename = '{msg}'")
         # data = cur.fetchone()
@@ -525,3 +532,8 @@ def deleteFile(request):
 
         messages.success(request, "File deleted succesfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+# def updateMard(request):
+#     cur = connections['default'].cursor()
+#     cur.execute(f"INSERT INTO File (Marks) VALUES ({marks}) ON DUPLICATE KEY UPDATE Marks = {marks} WHERE USN = '{}' AND Filename = '{}' ")
+#     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

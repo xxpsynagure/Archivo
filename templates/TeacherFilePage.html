@@ -131,8 +131,12 @@
                                 <div class="drive-item-footer module-footer">
                                     <form action="{% url 'downloadFile' %}" method="post">{%csrf_token%}
                                         <ul class="utilities list-inline">
-                                            <button value="{{values.by}}/{{key}}" id="downloadButton" name="downloadButton" ><i class="fa fa-download"></i></a></button>
+                                            <button value="downloadButton" id="downloadButton" name="downloadButton" type="submit"><i class="fa fa-download"></i></a></button>
+                                            <input type="text" value="{{values.by}}/{{key}}" name="downloadValue" id="donwloadValue" style="visibility: hidden;">
                                             <!-- <button><a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="fa fa-trash"></i></a></button> -->
+                                            <br><br>
+                                            <input type="number" name="marks" style="width: 4em;" placeholder="Marks" value="{{values.marks}}">
+                                            <button id="markCheck" name="markCheck"><i class="fa fa-check"></i></button>
                                         </ul>
                                     </form>
                                 </div>

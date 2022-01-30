@@ -128,7 +128,7 @@
                                     {% for key, value in filedata.items %}
                                     <tr>
                                         <td class="type"><i class="fa fa-file-text-o text-primary"></i></td>
-                                        <td class="name truncate">{{key}}</td>
+                                        <td class="name truncate">{{key}} &emsp13;  | &emsp13; Received marks: {{value.marks}}</td>
                                         <td class="date">{{value.time|date:"d M Y"}}</td>
                                         <td class="size">{{value.time|time:"TIME_FORMAT"}}</td>
                                         <td class="repo" id="repo">{{value.repo}}</td>

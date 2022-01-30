@@ -170,6 +170,7 @@ CREATE TABLE File (
     Usn CHAR(10) NOT NULL,
     Location VARCHAR(255),
     Uploaded DATETIME,
+    Marks SMALLINT,
     FOREIGN KEY (Repoid) REFERENCES Repository (Repoid) ON DELETE CASCADE,
     FOREIGN KEY (Usn) REFERENCES Student (usn),
     PRIMARY KEY(Repoid, Filename, Usn)
