@@ -19,6 +19,7 @@ urlpatterns = [
     path("TeacherDashboard/<ClassName>", views.TeacherFilePage, name="TeacherFilePage"),
     path("notifications",views.notifications, name="notifications"),
     path("downloadFile", views.downloadFile, name="downloadFile"),
-    path("deleteFile",views.deleteFile, name="deleteFile")
+    path("deleteFile",views.deleteFile, name="deleteFile"),
+    path("UserAdmin/", views.UserAdmin, name="UserAdmin"),
 ]
 

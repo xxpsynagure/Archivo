@@ -182,7 +182,7 @@ def trial(request): #trial purpose
     # p=models.Registration.objects.raw('SELECT * FROM Registration')[0]
     # print(p.username,p.email)
     
-    return render(request, "TeacherFilePage.html")
+    return render(request, "admin.html")
 
 def StudentDashboard(request):
     try:
@@ -533,7 +533,20 @@ def deleteFile(request):
         messages.success(request, "File deleted succesfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-# def updateMard(request):
-#     cur = connections['default'].cursor()
-#     cur.execute(f"INSERT INTO File (Marks) VALUES ({marks}) ON DUPLICATE KEY UPDATE Marks = {marks} WHERE USN = '{}' AND Filename = '{}' ")
-#     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+def UserAdmin(request):
+    if request.method != "POST":
+        cur  = connections['default'].cursor()
+        cur.execute(f"SELECT Subject.*,Teacher.Fname, Teacher.Lname FROM Subject LEFT JOIN Teacher ON Subject.ssid = Teacher.ssid;")
+        data = {str(i+1):{'ssid':item[0],'class':item[1], 'code':item[2], 'name':item[3], 'Fname':item[4], 'Lname':item[5]} for i,item in enumerate(cur.fetchall())}
+        return render(request, "admin.html", {'data':data})
+
+    ssid = request.POST.get('ssid')
+    Name = request.POST.get('Name')
+    Class = request.POST.get('Class')
+    Subcode = request.POST.get('Subcode')
+    Subname = request.POST.get('Subname')
+
+    cur = connections['default'].cursor()
+    cur.execute(f"INSERT INTO SUBJECT VALUES ('{ssid}', '{Class}', '{Subcode}', '{Subname}');")
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    

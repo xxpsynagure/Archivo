@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{%static 'css/index.css' %}">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="container-fluid p-0">
+            <h1 class="h3 mb-3">Welcome Admin</h1>
+            <div class="row">
+                <div class="col-xl-8">
+                    <div class="card">
+                        <div class="card-header pb-0">
+                            <div class="card-actions float-right">
+                                <div class="dropdown show">
+                                    
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">Teacher list</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Index</th>
+                                        <th>SSID</th>
+                                        <th>Name</th>
+                                        <th>Class</th>
+                                        <th>Code</th>
+                                        <th>Subject Name</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key, value in data.items %}
+                                    <tr>
+                                        <td>{{key}}</td>
+                                        <td>{{value.ssid}}</td>
+                                        {% if value.Fname == None %}
+                                            <td><span class="badge bg-dark">Inactive</span></td>
+                                        {% else %}
+                                            <td>{{value.Fname}}&nbsp;{{value.Lname}}</td>
+                                        {% endif %}
+                                        <td>{{value.class}}</td>
+                                        <td>{{value.code}}</td>
+                                        <td>{{value.name}}</td>
+                                        <td>{{value.dept}}</td>
+                                        <td><span class="badge bg-danger">Delete</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="col-xl-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-actions float-center">
+                                <div class="dropdown show">
+
+                                    <div class="registration-form">
+                                        <form action="" method="post">{%csrf_token%}
+                                            <div class="form-icon">
+                                                <span><i class="icon icon-user"></i></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control item"  name="ssid" placeholder="SSID">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control item"  name="Name" placeholder="Name">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control item"  name="Class" placeholder="Class">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control item"  name="Subcode" placeholder="Subject code">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control item"  name="Subname" placeholder="Subject name">
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-dark create-account">Add Faculty</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                        
+    
+                        
+    
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+    
+        </div>
+    </div>
+</body>
+</html>
