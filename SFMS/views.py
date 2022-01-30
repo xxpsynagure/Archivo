@@ -192,7 +192,9 @@ def StudentDashboard(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('Login')
     try:
-        cur.execute(f"SELECT S.Subject_code, S.Subject_name FROM Subject S WHERE S.Class = (SELECT Class FROM Student WHERE usn = '{USN}')")
+        cur.execute(f"""SELECT SH.Subject_code, S.Subject_name FROM Subject S, Subject_Handle SH 
+                            WHERE S.Subject_code = SH.Subject_code 
+                            AND SH.Class = (SELECT Class FROM Student WHERE usn = '{USN}')""")
     except IntegrityError or OperationalError as e:
         print(e)
         messages.warning(request, "Internal error in fetching subjects")
@@ -204,7 +206,9 @@ def StudentDashboard(request):
 def TeacherDashboard(request): 
     cur=connections['default'].cursor()
     try:
-        cur.execute(f"SELECT C.Branch, C.Sem, C.Sec, S.Subject_code, S.Subject_name FROM Subject S, Class C WHERE ssid = '{USN}' AND S.Class = C.Class")
+        cur.execute(f"""SELECT C.Branch, C.Sem, C.Sec, S.Subject_code, S.Subject_name 
+                            FROM Subject S, Subject_Handle SH, Class C 
+                            WHERE SH.ssid = '{USN}' AND SH.Class = C.Class AND SH.Subject_code = S.Subject_Code""")
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Could not fetch Subjects")
@@ -421,7 +425,10 @@ def TeacherFilePage(request, ClassName):
         data = {items[0]: items[0] for items in cur}
         # print(data)
         try:
-            cur.execute(f"select f.filename,f.Uploaded,r.Reponame,f.Usn,f.Marks from file f, repository r where f.repoid in (select rr.repoid from repository rr where Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; ")
+            cur.execute(f"""SELECT f.filename,f.Uploaded,r.Reponame,f.Usn,f.Marks 
+                                FROM File f, Repository r WHERE f.repoid 
+                                IN (SELECT rr.repoid FROM repository rr 
+                                WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; """)
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
@@ -430,19 +437,19 @@ def TeacherFilePage(request, ClassName):
 
     try:
         RepoName = request.POST.get('AssignmentName')
-        Repoid = request.POST.get('AssignmentID')
+        #Repoid = request.POST.get('AssignmentID')
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')
     ClassName = ClassName.replace('-','')
-    print(Repoid, RepoName, USN, ClassName, )
+    print(RepoName, USN, ClassName, )
     cur = connections['default'].cursor()
     try:
-        cur.execute(f"INSERT INTO Repository VALUES ('{Repoid}', '{RepoName}', '{USN}', '{ClassName}', ( SELECT Subject_code FROM Subject WHERE ssid = '{USN}' and Class = '{ClassName}') )")
+        cur.execute(f"INSERT INTO Repository(Reponame, ssid, Class, Subject_code) VALUES ('{RepoName}', '{USN}', '{ClassName}', ( SELECT Subject_code FROM Subject_Handle WHERE ssid = '{USN}' and Class = '{ClassName}') )")
     except (IntegrityError, OperationalError) as e:
         print(e)
-        messages.warning(request, "Assignment Id already in use")
+        messages.warning(request, "Assignment not created")
     ClassName = ClassName[:3]+'-'+ClassName[3:]
     return redirect('TeacherFilePage', ClassName)
 
@@ -536,7 +543,9 @@ def deleteFile(request):
 def UserAdmin(request):
     if request.method != "POST":
         cur  = connections['default'].cursor()
-        cur.execute(f"SELECT Subject.*,Teacher.Fname, Teacher.Lname FROM Subject LEFT JOIN Teacher ON Subject.ssid = Teacher.ssid;")
+        cur.execute(f"""SELECT Subject_Handle.*, Subject.Subject_name, Teacher.Fname, Teacher.Lname FROM Subject_Handle LEFT 
+                        JOIN Teacher ON Subject_Handle.ssid = Teacher.ssid 
+                        JOIN Subject ON Subject.Subject_code = Subject_Handle.Subject_code;""")
         data = {str(i+1):{'ssid':item[0],'class':item[1], 'code':item[2], 'name':item[3], 'Fname':item[4], 'Lname':item[5]} for i,item in enumerate(cur.fetchall())}
         return render(request, "admin.html", {'data':data})
 
@@ -544,9 +553,9 @@ def UserAdmin(request):
     Name = request.POST.get('Name')
     Class = request.POST.get('Class')
     Subcode = request.POST.get('Subcode')
-    Subname = request.POST.get('Subname')
+    #Subname = request.POST.get('Subname')
 
     cur = connections['default'].cursor()
-    cur.execute(f"INSERT INTO SUBJECT VALUES ('{ssid}', '{Class}', '{Subcode}', '{Subname}');")
+    cur.execute(f"INSERT INTO SUBJECT_Handle VALUES ('{ssid}', '{Class}', '{Subcode}');")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     
