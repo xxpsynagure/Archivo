@@ -29,7 +29,8 @@ def StudentReg(request):
     try:
         cur = connections['default'].cursor()
         try:
-            cur.execute(f"SELECT * FROM College ")
+            sql = "SELECT * FROM College"
+            cur.execute(sql)
         except (IntegrityError,OperationalError) as e:
             print(e)
             messages.warning(request, 'Cannot fetch colleges')
@@ -38,7 +39,8 @@ def StudentReg(request):
             params[item[0]]=item[1]
 
         try:
-            cur.execute(f"SELECT * FROM Branch")
+            sql = "SELECT * FROM Branch"
+            cur.execute(sql)
         except (IntegrityError,OperationalError) as e:
             print(e)
             messages.warning(request, "Cannot fetch branches")
@@ -54,11 +56,13 @@ def StudentReg(request):
         messages.warning(request, "Cannot connect to Database \n Please Try again later")
         raise Http404
 
+
 def TeacherReg(request):
     try:
         cur = connections['default'].cursor()
         try:
-            cur.execute(f"SELECT * FROM College ")
+            sql = "SELECT * FROM College"
+            cur.execute(sql)
         except (IntegrityError,OperationalError) as e:
             print(e)
             messages.warning(request, "Cannot fetch colleges")
@@ -66,7 +70,8 @@ def TeacherReg(request):
         for item in cur:
             params[item[0]]=item[1]
         try:
-            cur.execute(f"SELECT * FROM Branch")
+            sql = "SELECT * FROM Branch"
+            cur.execute(sql)
         except (IntegrityError,OperationalError) as e:
             print(e)
             messages.warning(request, "Cannot fetch branches")
@@ -82,23 +87,24 @@ def TeacherReg(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         raise Http404
 
-
 def error_404(request,exception):
     return render(request, "404.html")
 
 def doLogin(request):
     if (request.method!='POST'):
         raise Http404
-    try:
-        user = request.POST.get("your_username")
-        password = request.POST.get("your_pass")
-    except ObjectDoesNotExist as e:
-        print(e)
-        messages.warning(request, e.args)
-        return redirect('Login')
-    try:
+    
+    try:   
+        try:
+            params = (request.POST.get("your_username"), request.POST.get("your_pass")) 
+        except ObjectDoesNotExist as e:
+            print(e)
+            messages.warning(request, e.args)
+            return redirect('Login')
+
         cur = connections['default'].cursor()
-        p = cur.execute(f"SELECT * FROM Registration WHERE Username = '{user}' AND  Pass = md5('{password}');")
+        sql = "SELECT * FROM Registration WHERE Username = %s AND  Pass = md5(%s);"
+        p = cur.execute(sql, params)
     except (DatabaseError,DataError,IntegrityError) as e:
         print(e)
         messages.warning(request, "Cannot connect to Database, \n Please try again later")
@@ -117,18 +123,23 @@ def doLogin(request):
         messages.error(request, "Username or Password not matching, Please try again")
         return redirect('Login')
 
+
 def doReg(request):
     if (request.method!='POST'):
         raise Http404
     try:
-        user = request.POST.get("username")
         usn = request.POST.get("usn")
-        email =request.POST.get("email")
-        college =request.POST.get("college")
-        branch =request.POST.get("branch")
         passw = request.POST.get("pass")
-        re_pass =request.POST.get("re_pass")       
+        re_pass = request.POST.get("re_pass")
         T_or_S = 'T' if (request.META['HTTP_REFERER'][22:]) == 'TeacherReg/' else 'S'
+
+        params = ( usn,
+                    request.POST.get("username"),
+                    request.POST.get("email"),
+                    passw,
+                    request.POST.get("branch"),
+                    request.POST.get("college"),
+                    T_or_S)   
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
@@ -142,7 +153,8 @@ def doReg(request):
             messages.warning(request, "Cannot connect to Database \n Please try again later")
             return redirect('/#Error')
         try:
-            cursor.execute(f"INSERT INTO Registration VALUES('{usn}','{user}','{email}',md5('{passw}'),'{branch}','{college}', '{T_or_S}');")
+            sql = "INSERT INTO Registration VALUES(%s, %s, %s, md5(%s), %s, %s, %s);"   
+            cursor.execute(sql, params)
         except IntegrityError or OperationalError as e:
             print(e)
             refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Please fill in details"}
@@ -162,11 +174,12 @@ def doReg(request):
         messages.error(request, "Password not matching, Please Try again")
         return redirect(request.META['HTTP_REFERER'][22:])
 
+
 def greeting():
     cur = connections['default'].cursor() 
     print(USN)
     try:
-        cur.execute(f"CALL greetings('{USN}')")
+        cur.execute("CALL greetings(%s)", (USN,))
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Error in greeting , So exiting")
@@ -192,9 +205,10 @@ def StudentDashboard(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('Login')
     try:
-        cur.execute(f"""SELECT SH.Subject_code, S.Subject_name FROM Subject S, Subject_Handle SH 
-                            WHERE S.Subject_code = SH.Subject_code 
-                            AND SH.Class = (SELECT Class FROM Student WHERE usn = '{USN}')""")
+        sql = """SELECT SH.Subject_code, S.Subject_name FROM Subject S, Subject_Handle SH 
+                    WHERE S.Subject_code = SH.Subject_code 
+                    AND SH.Class = (SELECT Class FROM Student WHERE usn = %s)"""
+        cur.execute(sql, (USN,))
     except IntegrityError or OperationalError as e:
         print(e)
         messages.warning(request, "Internal error in fetching subjects")
@@ -203,12 +217,14 @@ def StudentDashboard(request):
     print(data)
     return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
 
+
 def TeacherDashboard(request): 
     cur=connections['default'].cursor()
     try:
-        cur.execute(f"""SELECT C.Branch, C.Sem, C.Sec, S.Subject_code, S.Subject_name 
-                            FROM Subject S, Subject_Handle SH, Class C 
-                            WHERE SH.ssid = '{USN}' AND SH.Class = C.Class AND SH.Subject_code = S.Subject_Code""")
+        sql = """SELECT C.Branch, C.Sem, C.Sec, S.Subject_code, S.Subject_name 
+                    FROM Subject S, Subject_Handle SH, Class C 
+                    WHERE SH.ssid = %s AND SH.Class = C.Class AND SH.Subject_code = S.Subject_Code"""
+        cur.execute(sql, (USN,))
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Could not fetch Subjects")
@@ -222,12 +238,11 @@ def TeacherDashboard(request):
     if(request.method == 'POST'):
         try:
             Class = "".join(request.POST.get("class").split('-'))
-            Title = request.POST.get("title")
-            Content = request.POST.get("content")
-            print(Class,Title,Content)
+            params = (USN, Class, request.POST.get("title"), request.POST.get("content"))
 
             cur=connections['default'].cursor()
-            cur.execute(f"INSERT INTO Notification(ssid,Class,Title,Message) VALUES ('{USN}','{Class}','{Title}','{Content}');")
+            sql = "INSERT INTO Notification(ssid,Class,Title,Message) VALUES (%s, %s, %s, %s);"
+            cur.execute(sql, params)
             messages.success(request,"Message Sent")
             
         except (ObjectDoesNotExist,AttributeError,TypeError) as e:
@@ -238,12 +253,12 @@ def TeacherDashboard(request):
     return render(request, "TeacherDashboard.html",{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'}|{'subject':data})
 
 
-
 def StudentProfile(request):
     if(request.method!='POST'):
         cur = connections['default'].cursor()
         try:
-            cur.execute(f"SELECT S.*, C.Branch, C.Sem, C.Sec FROM Student S, Class C WHERE USN = '{USN}' and S.Class = C.Class")
+            sql = "SELECT S.*, C.Branch, C.Sem, C.Sec FROM Student S, Class C WHERE USN = %s and S.Class = C.Class"
+            cur.execute(sql,(USN,))
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, "Cannot fetch the profile data from database")
@@ -252,7 +267,8 @@ def StudentProfile(request):
         if data is None:
             cur = connections['default'].cursor()
             try:
-                cur.execute(f"SELECT * FROM Registration WHERE usn_ssid = '{USN}'")
+                sql = "SELECT * FROM Registration WHERE usn_ssid = %s "
+                cur.execute(sql, (USN,))
             except (IntegrityError, OperationalError) as e:
                 print(e)
                 messages.warning(request, "Cannot fetch profile data from Registration table of database")
@@ -450,6 +466,8 @@ def TeacherFilePage(request, ClassName):
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Assignment not created")
+    finally:
+        messages.success(request,"Assignment created")
     ClassName = ClassName[:3]+'-'+ClassName[3:]
     return redirect('TeacherFilePage', ClassName)
 
