@@ -102,6 +102,8 @@
                                         <form action="{% url 'downloadFile' %}" method="post">{%csrf_token%}
                                       
                                             <button value="{{values.by}}/{{key}}" id="downloadButton" name="downloadButton" ><i class="fa fa-download"></i></button>
+                                            <input type="text" value="{{values.by}}/{{key}}" name="downloadValue" id="donwloadValue" style="visibility: hidden;">
+
                                             <!-- </a> -->
                                         </form>
                                     </ul>

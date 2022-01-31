@@ -281,28 +281,24 @@ def StudentProfile(request):
                                                         'usn':data[0], 'Fname':data[1], 'Lname':data[2], 'Branch':data[10], 'Sem':data[11], 'Sec':data[12],
                                                         'DOB':str(data[4]), 'Email':data[5], 'Phno':data[6], 'Portfolio_links':data[8], 'About':data[9]})
     try:
-        usn = request.POST.get("usn")
-        Fname = request.POST.get("Fname")
-        Lname = request.POST.get("Lname")
-        Branch= request.POST.get("Branch")
-        Sem = request.POST.get("Sem")
-        Sec = request.POST.get("Sec")
-        DOB = request.POST.get("DOB")
-        Email = request.POST.get("Email")
-        Phno = request.POST.get("Phno")
-        Portfolio_links = request.POST.get("Portfolio_links")
-        About = request.POST.get("About")
-        Image = request.POST.get("Image")
-        Class = Branch + str(Sem) + Sec
+        Class = request.POST.get("Branch") + str(request.POST.get("Sem")) + request.POST.get("Sec")
         print(Class)
 
+        params = (request.POST.get("usn"),
+                   request.POST.get("Fname"),
+                    request.POST.get("Lname"),
+                    Class,
+                    request.POST.get("DOB"),
+                    request.POST.get("Email"),
+                    request.POST.get("Phno"),
+                    request.POST.get("Image"),
+                    request.POST.get("Portfolio_links"),
+                    request.POST.get("About"))     
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')    
     
-    print(usn, Fname, Lname, Branch, Sem, Sec, DOB, Email, Phno, Portfolio_links, About)
-
     try:
         cursor = connections['default'].cursor()
     except DatabaseError as e:
@@ -310,7 +306,11 @@ def StudentProfile(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('/#Error')
     try:
-        cursor.execute(f"INSERT INTO Student VALUES('{usn}','{Fname}','{Lname}','{Class}','{DOB}', '{Email}', '{Phno}', '{Image}', '{Portfolio_links}', '{About}') ON DUPLICATE KEY UPDATE usn = '{usn}', Fname='{Fname}', Lname='{Lname}', Class='{Class}', DOB='{DOB}', Email='{Email}', Phno='{Phno}', Image='{Image}', Portfolio_links='{Portfolio_links}', About='{About}';")
+        sql =  """INSERT INTO Student VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+                        ON DUPLICATE KEY UPDATE usn = %s, Fname= %s, Lname= %s, Class= %s, DOB= %s,
+                        Email= %s, Phno= %s, Image= %s, Portfolio_links= %s, About= %s;"""
+        cursor.execute(sql, (params + params) )
+
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.error(request,e.args)
@@ -321,7 +321,8 @@ def TeacherProfile(request):
     if(request.method!='POST'):
         cur = connections['default'].cursor()
         try:
-            cur.execute(f"SELECT * FROM Teacher WHERE SSID = '{USN}'")
+            sql = "SELECT * FROM Teacher WHERE SSID = %s"
+            cur.execute(sql, (USN,))
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
@@ -329,7 +330,8 @@ def TeacherProfile(request):
         if data is None:
             cur = connections['default'].cursor()
             try:
-                cur.execute(f"SELECT * FROM Registration WHERE usn_ssid = '{USN}'")
+                sql = "SELECT * FROM Registration WHERE usn_ssid = %s"
+                cur.execute(sql, (USN,))
             except (IntegrityError, OperationalError) as e:
                 print(e)
                 messages.error(request, e.args)
@@ -340,22 +342,31 @@ def TeacherProfile(request):
         return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':data[1], 'Lname':data[2],
                                                         'Designation':data[3], 'Department':data[4], 'yr_of_exp':data[5], 'Email':data[6], 'Phno':data[7], 'Skills':data[8]})
     try:
-        ssid = request.POST.get("ssid")
-        Fname = request.POST.get("Fname")
-        Lname = request.POST.get("Lname")
-        Designation = request.POST.get("Designation")
-        Department = request.POST.get("Department")
-        yr_of_exp = request.POST.get("yr_of_exp")
-        Email = request.POST.get("Email")
-        Phno = request.POST.get("Phno")
-        Skills = request.POST.get("Skills")
-        Image = request.POST.get("Image")
+        """ ssid = 
+        Fname = 
+        Lname = 
+        Designation = 
+        Department = 
+        yr_of_exp = 
+        Email = 
+        Phno = 
+        Skills = 
+        Image =  """
+
+        params = (request.POST.get("ssid"),
+                    request.POST.get("Fname"),
+                    request.POST.get("Lname"),
+                    request.POST.get("Designation"),
+                    request.POST.get("Department"),
+                    request.POST.get("yr_of_exp"),
+                    request.POST.get("Email"),
+                    request.POST.get("Phno"),
+                    request.POST.get("Skills"),
+                    request.POST.get("Image"))
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')    
-    
-    print(ssid, Fname, Lname, Department, Designation, yr_of_exp, Email, Skills)
 
     try:
         cursor = connections['default'].cursor()
@@ -364,7 +375,10 @@ def TeacherProfile(request):
         messages.warning(request, "Cannot connect to Database \n Please try again later")
         return redirect('/#Error')
     try:
-        cursor.execute(f"INSERT INTO Teacher VALUES('{ssid}','{Fname}','{Lname}','{Designation}','{Department}','{yr_of_exp}', '{Email}', '{Phno}', '{Skills}', '{Image}') ON DUPLICATE KEY UPDATE SSID='{ssid}', Fname='{Fname}', Lname='{Lname}', Designation='{Designation}', Department='{Department}', yr_of_exp='{yr_of_exp}', Email='{Email}', Phno='{Phno}',Skills='{Skills}', Image='{Image}';")
+        sql = """INSERT INTO Teacher VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+                    ON DUPLICATE KEY UPDATE SSID= %s, Fname= %s, Lname= %s, Designation= %s, Department= %s, 
+                    yr_of_exp= %s, Email= %s, Phno= %s,Skills= %s, Image= %s;"""
+        cursor.execute(sql, (params + params) )
     except (IntegrityError,OperationalError) as e:
         print(e)
         messages.error(request, e.args)
@@ -379,13 +393,19 @@ def StudentFilePage(request, SubjectCode):
         cur = connections['default'].cursor()
         SubjectCode = str(SubjectCode)
         try:
-            cur.execute(f"SELECT Reponame from Repository WHERE Subject_code = '{SubjectCode}' and Class = (SELECT Class from Student WHERE USN = '{USN}') ;")
+            sql = """SELECT Reponame from Repository 
+                        WHERE Subject_code = %s 
+                        AND Class = (SELECT Class FROM Student WHERE USN = %s) ;"""
+            cur.execute(sql, (SubjectCode, USN) )
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
         data = {items[0]: items[0] for items in cur}
         try:
-            cur.execute(f"select f.filename, f.Uploaded,r.Reponame, f.Usn, f.Marks from file f ,Repository r where f.repoid in (select repoid from repository where subject_code = '{SubjectCode}') AND USN = '{USN}' AND f.Repoid = r.Repoid; ")
+            sql = """SELECT f.Filename, f.Uploaded,r.Reponame, f.Usn, f.Marks FROM File f ,Repository r 
+                        WHERE f.Repoid IN (SELECT Repoid FROM Repository WHERE Subject_code = %s) 
+                        AND USN = %s AND f.Repoid = r.Repoid; """
+            cur.execute(sql, (SubjectCode, USN))
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
@@ -415,10 +435,12 @@ def StudentFilePage(request, SubjectCode):
     # uploadFile = uploadFile.replace("'","_")
     try:
         cur = connections['default'].cursor()
-        cur.execute(f"""INSERT INTO File (Repoid, Filename, Usn, Location) VALUES 
-                        ( (SELECT Repoid FROM Repository WHERE Reponame = '{RepoName}' AND Class = (SELECT Class FROM STUDENT WHERE USN = '{USN}') ), 
-                        '{FileName}', '{USN}', '{FileLocation}')
-                        """)
+        sql = """INSERT INTO File (Repoid, Filename, Usn, Location) VALUES 
+                ( (SELECT Repoid FROM Repository WHERE Reponame = %s 
+                AND Class = (SELECT Class FROM STUDENT WHERE USN = %s) ), 
+                %s, %s, %s)
+                """
+        cur.execute(sql, (RepoName, USN, FileName, USN, FileLocation))
     except (IntegrityError,OperationalError) as e:
         print(e)
         messages.error(request, "Please select the Assignment repository before uploading the file")
@@ -434,35 +456,44 @@ def TeacherFilePage(request, ClassName):
             raise Http404
         cur = connections['default'].cursor()
         try:
-            cur.execute(f"SELECT Reponame from Repository WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}' ;")
+            sql = "SELECT Reponame FROM Repository WHERE Class = %s AND ssid = %s ;"
+            cur.execute(sql, (ClassName.replace('-',''), USN) )
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
         data = {items[0]: items[0] for items in cur}
         # print(data)
         try:
-            cur.execute(f"""SELECT f.filename,f.Uploaded,r.Reponame,f.Usn,f.Marks 
-                                FROM File f, Repository r WHERE f.repoid 
-                                IN (SELECT rr.repoid FROM repository rr 
-                                WHERE Class = '{ClassName.replace('-','')}' AND ssid = '{USN}') AND f.Repoid = r.Repoid; """)
+            sql = """SELECT f.filename,f.Uploaded,r.Reponame,f.Usn,f.Marks 
+                        FROM File f, Repository r WHERE f.repoid 
+                        IN (SELECT rr.repoid FROM repository rr 
+                        WHERE Class = %s AND ssid = %s) AND f.Repoid = r.Repoid; """
+            cur.execute(sql, (ClassName.replace('-',''), USN))
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
         filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3], 'marks':items[4]} for items in cur}
         return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata, 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
-
+    
+    ClassName = ClassName.replace('-','')
     try:
-        RepoName = request.POST.get('AssignmentName')
-        #Repoid = request.POST.get('AssignmentID')
+        params = (request.POST.get('AssignmentName'),
+                    USN,
+                    ClassName,
+                    USN,
+                    ClassName)
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')
-    ClassName = ClassName.replace('-','')
-    print(RepoName, USN, ClassName, )
+    
+    #print(RepoName, USN, ClassName, )
     cur = connections['default'].cursor()
     try:
-        cur.execute(f"INSERT INTO Repository(Reponame, ssid, Class, Subject_code) VALUES ('{RepoName}', '{USN}', '{ClassName}', ( SELECT Subject_code FROM Subject_Handle WHERE ssid = '{USN}' and Class = '{ClassName}') )")
+        sql = """INSERT INTO Repository(Reponame, ssid, Class, Subject_code) 
+                        VALUES (%s, %s, %s, 
+                        ( SELECT Subject_code FROM Subject_Handle WHERE ssid = %s and Class = %s) )"""
+        cur.execute(sql, params)
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Assignment not created")
@@ -474,9 +505,10 @@ def TeacherFilePage(request, ClassName):
 def notifications(request):
     cur = connections['default'].cursor()
     try:
-        cur.execute(f"""SELECT DISTINCT M.* FROM Message_recieved M
-                    WHERE M.Class = (SELECT S.Class FROM Student S WHERE S.usn = '{USN}')
-                    ORDER BY M.Sent_time DESC;""")
+        sql = """SELECT DISTINCT M.* FROM Message_recieved M
+                    WHERE M.Class = (SELECT S.Class FROM Student S WHERE S.usn = %s)
+                    ORDER BY M.Sent_time DESC;"""
+        cur.execute(sql, (USN,))
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Unable to update notification, please try again later.")
@@ -507,7 +539,8 @@ def downloadFile(request):
 
         if btn is None:
             cur = connections['default'].cursor()
-            cur.execute(f"UPDATE File SET Marks = {marks} WHERE USN = '{msg.split('/')[0]}' AND Filename = '{msg.split('/')[1]}' ")
+            sql = "UPDATE File SET Marks = %s WHERE USN = %s AND Filename = %s "
+            cur.execute(sql, (marks, msg.split('/')[0], msg.split('/')[1]) )
             return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
         # cur = connections['default'].cursor()
         # cur.execute(f"SELECT Content from file where Filename = '{msg}'")
@@ -547,7 +580,8 @@ def deleteFile(request):
 
         cur = connections['default'].cursor()
         try:
-            cur.execute(f"delete from file where Filename = '{msg[1]}' and Usn = '{msg[0]}'")
+            sql = "DELETE FROM File WHERE Filename = %s AND Usn = %s"
+            cur.execute(sql, (msg[1], msg[0]) )
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
@@ -561,19 +595,19 @@ def deleteFile(request):
 def UserAdmin(request):
     if request.method != "POST":
         cur  = connections['default'].cursor()
-        cur.execute(f"""SELECT Subject_Handle.*, Subject.Subject_name, Teacher.Fname, Teacher.Lname FROM Subject_Handle LEFT 
-                        JOIN Teacher ON Subject_Handle.ssid = Teacher.ssid 
-                        JOIN Subject ON Subject.Subject_code = Subject_Handle.Subject_code;""")
+        sql = """SELECT Subject_Handle.*, Subject.Subject_name, Teacher.Fname, Teacher.Lname FROM Subject_Handle LEFT 
+                    JOIN Teacher ON Subject_Handle.ssid = Teacher.ssid 
+                    JOIN Subject ON Subject.Subject_code = Subject_Handle.Subject_code;"""
+        cur.execute(sql)
         data = {str(i+1):{'ssid':item[0],'class':item[1], 'code':item[2], 'name':item[3], 'Fname':item[4], 'Lname':item[5]} for i,item in enumerate(cur.fetchall())}
         return render(request, "admin.html", {'data':data})
 
     ssid = request.POST.get('ssid')
-    Name = request.POST.get('Name')
     Class = request.POST.get('Class')
     Subcode = request.POST.get('Subcode')
-    #Subname = request.POST.get('Subname')
-
+  
     cur = connections['default'].cursor()
-    cur.execute(f"INSERT INTO SUBJECT_Handle VALUES ('{ssid}', '{Class}', '{Subcode}');")
+    sql = "INSERT INTO SUBJECT_Handle VALUES (%s, %s, %s);"
+    cur.execute(sql, (ssid, Class, Subcode))
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     
