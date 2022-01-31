@@ -17,7 +17,7 @@ from django.core.files.base import ContentFile
 import json
 import base64
 
-USN =''
+# USN =''
 # Create your views here.
 def index(request):
     return render(request,"index.html")
@@ -93,8 +93,8 @@ def error_404(request,exception):
 def doLogin(request):
     if (request.method!='POST'):
         raise Http404
-    request.session['user'] = request.POST.get("your_username")
-    print("logged in user is ",request.session.get('user'))
+    # request.session['user'] = request.POST.get("your_username")
+    # print("logged in user is ",request.session.get('user'))
     try:   
         try:
             params = (request.POST.get("your_username"), request.POST.get("your_pass")) 
@@ -114,10 +114,10 @@ def doLogin(request):
     if(p):
         messages.success(request, "Login successful")
         data = cur.fetchall()
-        global USN
-        USN=data[0][0]
+        # global USN
+        request.session['user']=data[0][0]
         if(data[0][6]=='S'):
-            print(USN)
+            print(request.session.get('user'))
             return redirect("StudentDashboard")
         return redirect("TeacherDashboard")
     else:
@@ -129,12 +129,12 @@ def doReg(request):
     if (request.method!='POST'):
         raise Http404
     try:
-        usn = request.POST.get("usn")
+        request.session['user'] = request.POST.get("usn")
         passw = request.POST.get("pass")
         re_pass = request.POST.get("re_pass")
         T_or_S = 'T' if (request.META['HTTP_REFERER'][22:]) == 'TeacherReg/' else 'S'
 
-        params = ( usn,
+        params = ( request.session.get('user'),
                     request.POST.get("username"),
                     request.POST.get("email"),
                     passw,
@@ -163,9 +163,9 @@ def doReg(request):
             return redirect(request.META['HTTP_REFERER'][22:])
 
         messages.success(request, "Registration Succesful")
-        global USN
-        USN = usn
-        print(USN)
+        # global USN
+        # USN = usn
+        # print(USN)
         if T_or_S == 'S':
             return redirect('StudentProfile')
         else:
@@ -176,11 +176,11 @@ def doReg(request):
         return redirect(request.META['HTTP_REFERER'][22:])
 
 
-def greeting():
+def greeting(request):
     cur = connections['default'].cursor() 
-    print(USN)
+    print(request.session.get('user'))
     try:
-        cur.execute("CALL greetings(%s)", (USN,))
+        cur.execute("CALL greetings(%s)", (request.session.get('user'),))
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Error in greeting , So exiting")
@@ -209,14 +209,14 @@ def StudentDashboard(request):
         sql = """SELECT SH.Subject_code, S.Subject_name FROM Subject S, Subject_Handle SH 
                     WHERE S.Subject_code = SH.Subject_code 
                     AND SH.Class = (SELECT Class FROM Student WHERE usn = %s)"""
-        cur.execute(sql, (USN,))
+        cur.execute(sql, (request.session.get('user'),))
     except IntegrityError or OperationalError as e:
         print(e)
         messages.warning(request, "Internal error in fetching subjects")
         return redirect('Login')
     data = {items[0]: items[1] for items in cur}
     print(data)
-    return render(request, "StudentDashboard.html",{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
+    return render(request, "StudentDashboard.html",{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
 
 
 def TeacherDashboard(request): 
@@ -225,7 +225,7 @@ def TeacherDashboard(request):
         sql = """SELECT C.Branch, C.Sem, C.Sec, S.Subject_code, S.Subject_name 
                     FROM Subject S, Subject_Handle SH, Class C 
                     WHERE SH.ssid = %s AND SH.Class = C.Class AND SH.Subject_code = S.Subject_Code"""
-        cur.execute(sql, (USN,))
+        cur.execute(sql, (request.session.get('user'),))
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Could not fetch Subjects")
@@ -239,7 +239,7 @@ def TeacherDashboard(request):
     if(request.method == 'POST'):
         try:
             Class = "".join(request.POST.get("class").split('-'))
-            params = (USN, Class, request.POST.get("title"), request.POST.get("content"))
+            params = (request.session.get('user'), Class, request.POST.get("title"), request.POST.get("content"))
 
             cur=connections['default'].cursor()
             sql = "INSERT INTO Notification(ssid,Class,Title,Message) VALUES (%s, %s, %s, %s);"
@@ -251,7 +251,7 @@ def TeacherDashboard(request):
             messages.warning(request, "Form not filled, \n Please check again")
             return redirect('TeacherDashboard')    
         
-    return render(request, "TeacherDashboard.html",{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'}|{'subject':data})
+    return render(request, "TeacherDashboard.html",{'username':greeting(request), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'}|{'subject':data})
 
 
 def StudentProfile(request):
@@ -259,7 +259,7 @@ def StudentProfile(request):
         cur = connections['default'].cursor()
         try:
             sql = "SELECT S.*, C.Branch, C.Sem, C.Sec FROM Student S, Class C WHERE USN = %s and S.Class = C.Class"
-            cur.execute(sql,(USN,))
+            cur.execute(sql,(request.session.get('user'),))
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, "Cannot fetch the profile data from database")
@@ -269,16 +269,16 @@ def StudentProfile(request):
             cur = connections['default'].cursor()
             try:
                 sql = "SELECT * FROM Registration WHERE usn_ssid = %s "
-                cur.execute(sql, (USN,))
+                cur.execute(sql, (request.session.get('user'),))
             except (IntegrityError, OperationalError) as e:
                 print(e)
                 messages.warning(request, "Cannot fetch profile data from Registration table of database")
             data = cur.fetchone()
-            return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
+            return render(request, 'StudentProfile.html',{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
                                                         'usn':data[0], 'Fname':'', 'Lname':'', 'Branch':data[4], 'Sem':'', 'Sec':'',
                                                         'DOB':'', 'Email':data[2], 'Phno':'', 'Portfolio_links':'', 'About':''})
             
-        return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
+        return render(request, 'StudentProfile.html',{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
                                                         'usn':data[0], 'Fname':data[1], 'Lname':data[2], 'Branch':data[10], 'Sem':data[11], 'Sec':data[12],
                                                         'DOB':str(data[4]), 'Email':data[5], 'Phno':data[6], 'studentImage':data[7], 'Portfolio_links':data[8], 'About':data[9], 'root':settings.MEDIA_ROOT})
     try:
@@ -292,7 +292,7 @@ def StudentProfile(request):
                     request.POST.get("DOB"),
                     request.POST.get("Email"),
                     request.POST.get("Phno"),
-                    USN+"/"+request.FILES["StudentImage"].name,
+                    request.session.get('user')+"/"+request.FILES["StudentImage"].name,
                     request.POST.get("Portfolio_links"),
                     request.POST.get("About"),
                      )
@@ -326,7 +326,7 @@ def TeacherProfile(request):
         cur = connections['default'].cursor()
         try:
             sql = "SELECT * FROM Teacher WHERE SSID = %s"
-            cur.execute(sql, (USN,))
+            cur.execute(sql, (request.session.get('user'),))
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
@@ -335,15 +335,15 @@ def TeacherProfile(request):
             cur = connections['default'].cursor()
             try:
                 sql = "SELECT * FROM Registration WHERE usn_ssid = %s"
-                cur.execute(sql, (USN,))
+                cur.execute(sql, (request.session.get('user'),))
             except (IntegrityError, OperationalError) as e:
                 print(e)
                 messages.error(request, e.args)
             data = cur.fetchone()
-            return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':'', 'Lname':'',
+            return render(request, 'TeacherProfile.html',{'username':greeting(request), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':'', 'Lname':'',
                                                         'Designation':'', 'Department':data[4], 'yr_of_exp':'', 'Email':data[2], 'Phno':'', 'Skills':''})
 
-        return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':data[1], 'Lname':data[2],
+        return render(request, 'TeacherProfile.html',{'username':greeting(request), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':data[1], 'Lname':data[2],
                                                         'Designation':data[3], 'Department':data[4], 'yr_of_exp':data[5], 'Email':data[6], 'Phno':data[7], 'Skills':data[8], 'TeacherImage':data[9], 'root':settings.MEDIA_ROOT})
     try:
         # """ ssid = 
@@ -366,7 +366,7 @@ def TeacherProfile(request):
                     request.POST.get("Email"),
                     request.POST.get("Phno"),
                     request.POST.get("Skills"),
-                    USN+"_"+request.FILES['TeacherImage'].name
+                    request.session.get('user')+"_"+request.FILES['TeacherImage'].name
         )
         File = request.FILES['TeacherImage']
     except ObjectDoesNotExist as e:
@@ -404,7 +404,7 @@ def StudentFilePage(request, SubjectCode):
             sql = """SELECT Reponame from Repository 
                         WHERE Subject_code = %s 
                         AND Class = (SELECT Class FROM Student WHERE USN = %s) ;"""
-            cur.execute(sql, (SubjectCode, USN) )
+            cur.execute(sql, (SubjectCode, request.session.get('user')) )
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
@@ -413,13 +413,13 @@ def StudentFilePage(request, SubjectCode):
             sql = """SELECT f.Filename, f.Uploaded,r.Reponame, f.Usn, f.Marks FROM File f ,Repository r 
                         WHERE f.Repoid IN (SELECT Repoid FROM Repository WHERE Subject_code = %s) 
                         AND USN = %s AND f.Repoid = r.Repoid; """
-            cur.execute(sql, (SubjectCode, USN))
+            cur.execute(sql, (SubjectCode, request.session.get('user')))
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
         filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3], 'marks':items[4]} for items in cur}
         print(filedata)
-        return render(request, 'StudentFilePage.html', {'username':greeting(), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata, 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
+        return render(request, 'StudentFilePage.html', {'username':greeting(request), 'SubjectName':SubjectCode, 'data':data, 'filedata':filedata, 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
     
     try:
         FileName = request.POST.get("FileName")
@@ -430,9 +430,9 @@ def StudentFilePage(request, SubjectCode):
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')
 
-    print(FileName.split('\\')[-1], RepoName, USN, type(File))
+    print(FileName.split('\\')[-1], RepoName, request.session.get('user'), type(File))
     FileName = FileName.split('\\')[-1]
-    FileLocation = USN+'/'+FileName
+    FileLocation = request.session.get('user')+'/'+FileName
     path = default_storage.save(FileLocation, ContentFile(File.read())) # Downloading the file
     print(path)
     # print(File.content_type)
@@ -448,12 +448,12 @@ def StudentFilePage(request, SubjectCode):
                 AND Class = (SELECT Class FROM STUDENT WHERE USN = %s) ), 
                 %s, %s, %s)
                 """
-        cur.execute(sql, (RepoName, USN, FileName, USN, FileLocation))
+        cur.execute(sql, (RepoName, request.session.get('user'), FileName, request.session.get('user'), FileLocation))
     except (IntegrityError,OperationalError) as e:
         print(e)
         messages.error(request, "Please select the Assignment repository before uploading the file")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-    # cur.execute(f"SELECT Filename,Content from file where Usn = '{USN}'")
+    # cur.execute(f"SELECT Filename,Content from file where Usn = '{request.session.get('user')}'")
     # file = cur.fetchone()
 
     return redirect('StudentFilePage', SubjectCode)
@@ -465,7 +465,7 @@ def TeacherFilePage(request, ClassName):
         cur = connections['default'].cursor()
         try:
             sql = "SELECT Reponame FROM Repository WHERE Class = %s AND ssid = %s ;"
-            cur.execute(sql, (ClassName.replace('-',''), USN) )
+            cur.execute(sql, (ClassName.replace('-',''), request.session.get('user')) )
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
@@ -476,19 +476,19 @@ def TeacherFilePage(request, ClassName):
                         FROM File f, Repository r WHERE f.repoid 
                         IN (SELECT rr.repoid FROM repository rr 
                         WHERE Class = %s AND ssid = %s) AND f.Repoid = r.Repoid; """
-            cur.execute(sql, (ClassName.replace('-',''), USN))
+            cur.execute(sql, (ClassName.replace('-',''), request.session.get('user')))
         except (IntegrityError, OperationalError) as e:
             print(e)
             messages.error(request, e.args)
         filedata = {items[0]: {'time':items[1], 'repo':items[2], 'by':items[3], 'marks':items[4]} for items in cur}
-        return render(request, "TeacherFilePage.html", {'username':greeting(), 'SubjectName':ClassName, 'data':data, 'filedata':filedata, 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
+        return render(request, "TeacherFilePage.html", {'username':greeting(request), 'SubjectName':ClassName, 'data':data, 'filedata':filedata, 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile'})
     
     ClassName = ClassName.replace('-','')
     try:
         params = (request.POST.get('AssignmentName'),
-                    USN,
+                    request.session.get('user'),
                     ClassName,
-                    USN,
+                    request.session.get('user'),
                     ClassName,
                     request.POST.get('Comments')
                     )
@@ -497,7 +497,7 @@ def TeacherFilePage(request, ClassName):
         messages.warning(request, "Form not filled, \n Please check again")
         return redirect('#')
     
-    #print(RepoName, USN, ClassName, )
+    #print(RepoName, request.session.get('user'), ClassName, )
     cur = connections['default'].cursor()
     try:
         sql = """INSERT INTO Repository(Reponame, ssid, Class, Subject_code, Comments) 
@@ -518,7 +518,7 @@ def notifications(request):
         sql = """SELECT DISTINCT M.* FROM Message_recieved M
                     WHERE M.Class = (SELECT S.Class FROM Student S WHERE S.usn = %s)
                     ORDER BY M.Sent_time DESC;"""
-        cur.execute(sql, (USN,))
+        cur.execute(sql, (request.session.get('user'),))
     except (IntegrityError, OperationalError) as e:
         print(e)
         messages.warning(request, "Unable to update notification, please try again later.")
@@ -534,7 +534,7 @@ def notifications(request):
         data.append(dict)
     # print(data)
 
-    return render(request, "notifications.html",{'username':greeting()}|{'message':data,'url':'/StudentDashboard','Purl':'/StudentDashboard/StudentProfile'})
+    return render(request, "notifications.html",{'username':greeting(request)}|{'message':data,'url':'/StudentDashboard','Purl':'/StudentDashboard/StudentProfile'})
 
 
 def downloadFile(request):
