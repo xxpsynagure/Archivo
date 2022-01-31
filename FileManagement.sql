@@ -211,3 +211,10 @@ RIGHT JOIN Teacher T ON N.ssid = T.ssid
 LEFT JOIN Subject_Handle SH ON N.ssid = SH.ssid
 RIGHT JOIN Subject S ON S.Subject_code = SH.Subject_code 
 JOIN Class C ON N.Class = C.Class;
+
+
+CREATE TABLE User_Admin(
+	ssid CHAR(10) PRIMARY KEY,
+    passw VARCHAR(255) NOT NULL,
+    FOREIGN KEY (ssid) REFERENCES Teacher(ssid)
+);
