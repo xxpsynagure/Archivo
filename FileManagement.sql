@@ -56,7 +56,7 @@ CREATE TABLE Teacher (
     Email VARCHAR(255) NOT NULL,
     Phno NUMERIC(13) NOT NULL,
     Skills VARCHAR(255),
-    Image BLOB,
+    Image VARCHAR(255),
     FOREIGN KEY (Department) REFERENCES Branch (Branch_id),
     FOREIGN KEY (ssid) REFERENCES Registration (usn_ssid)
 );
@@ -102,7 +102,7 @@ CREATE TABLE Student (
     DOB DATE NOT NULL,
     Email VARCHAR(255) NOT NULL,
     Phno NUMERIC(13) NOT NULL,
-    Image BLOB,
+    Image VARCHAR(255),
     Portfolio_links VARCHAR(500),
     About VARCHAR(700),
     FOREIGN KEY (Class) REFERENCES Class(Class),
@@ -155,6 +155,7 @@ CREATE TABLE Repository (
     ssid VARCHAR(10) NOT NULL,
     Class VARCHAR(10) NOT NULL,
     Subject_code VARCHAR(10),
+    Comments VARCHAR(500),
     FOREIGN KEY (ssid) REFERENCES Teacher (ssid) ON DELETE CASCADE,
     FOREIGN KEY (Class) REFERENCES Class (Class)
 );
@@ -211,6 +212,14 @@ RIGHT JOIN Teacher T ON N.ssid = T.ssid
 LEFT JOIN Subject_Handle SH ON N.ssid = SH.ssid
 RIGHT JOIN Subject S ON S.Subject_code = SH.Subject_code 
 JOIN Class C ON N.Class = C.Class;
+
+DELIMITER |
+CREATE TRIGGER assignment_notification
+AFTER INSERT ON Repository FOR EACH ROW
+BEGIN
+	INSERT INTO Notification(ssid,Class,Title,Message) VALUES (NEW.ssid, NEW.Class, CONCAT(NEW.Reponame," ",NEW.Subject_code), NEW.Comments);
+END;
+|
 
 
 CREATE TABLE User_Admin(

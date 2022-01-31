@@ -93,7 +93,8 @@ def error_404(request,exception):
 def doLogin(request):
     if (request.method!='POST'):
         raise Http404
-    
+    request.session['user'] = request.POST.get("your_username")
+    print("logged in user is ",request.session.get('user'))
     try:   
         try:
             params = (request.POST.get("your_username"), request.POST.get("your_pass")) 
@@ -279,7 +280,7 @@ def StudentProfile(request):
             
         return render(request, 'StudentProfile.html',{'username':greeting(), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
                                                         'usn':data[0], 'Fname':data[1], 'Lname':data[2], 'Branch':data[10], 'Sem':data[11], 'Sec':data[12],
-                                                        'DOB':str(data[4]), 'Email':data[5], 'Phno':data[6], 'Portfolio_links':data[8], 'About':data[9]})
+                                                        'DOB':str(data[4]), 'Email':data[5], 'Phno':data[6], 'studentImage':data[7], 'Portfolio_links':data[8], 'About':data[9], 'root':settings.MEDIA_ROOT})
     try:
         Class = request.POST.get("Branch") + str(request.POST.get("Sem")) + request.POST.get("Sec")
         print(Class)
@@ -291,9 +292,11 @@ def StudentProfile(request):
                     request.POST.get("DOB"),
                     request.POST.get("Email"),
                     request.POST.get("Phno"),
-                    request.POST.get("Image"),
+                    USN+"/"+request.FILES["StudentImage"].name,
                     request.POST.get("Portfolio_links"),
-                    request.POST.get("About"))     
+                    request.POST.get("About"),
+                     )
+        File = request.FILES["StudentImage"]
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
@@ -310,6 +313,7 @@ def StudentProfile(request):
                         ON DUPLICATE KEY UPDATE usn = %s, Fname= %s, Lname= %s, Class= %s, DOB= %s,
                         Email= %s, Phno= %s, Image= %s, Portfolio_links= %s, About= %s;"""
         cursor.execute(sql, (params + params) )
+        default_storage.save(params[7], ContentFile(File.read())) # Downloading the file
 
     except (IntegrityError, OperationalError) as e:
         print(e)
@@ -340,18 +344,18 @@ def TeacherProfile(request):
                                                         'Designation':'', 'Department':data[4], 'yr_of_exp':'', 'Email':data[2], 'Phno':'', 'Skills':''})
 
         return render(request, 'TeacherProfile.html',{'username':greeting(), 'url':'/TeacherDashboard', 'Purl':'/TeacherDashboard/TeacherProfile', 'ssid':data[0], 'Fname':data[1], 'Lname':data[2],
-                                                        'Designation':data[3], 'Department':data[4], 'yr_of_exp':data[5], 'Email':data[6], 'Phno':data[7], 'Skills':data[8]})
+                                                        'Designation':data[3], 'Department':data[4], 'yr_of_exp':data[5], 'Email':data[6], 'Phno':data[7], 'Skills':data[8], 'TeacherImage':data[9], 'root':settings.MEDIA_ROOT})
     try:
-        """ ssid = 
-        Fname = 
-        Lname = 
-        Designation = 
-        Department = 
-        yr_of_exp = 
-        Email = 
-        Phno = 
-        Skills = 
-        Image =  """
+        # """ ssid = 
+        # Fname = 
+        # Lname = 
+        # Designation = 
+        # Department = 
+        # yr_of_exp = 
+        # Email = 
+        # Phno = 
+        # Skills = 
+        # Image =  """
 
         params = (request.POST.get("ssid"),
                     request.POST.get("Fname"),
@@ -362,7 +366,9 @@ def TeacherProfile(request):
                     request.POST.get("Email"),
                     request.POST.get("Phno"),
                     request.POST.get("Skills"),
-                    request.POST.get("Image"))
+                    USN+"_"+request.FILES['TeacherImage'].name
+        )
+        File = request.FILES['TeacherImage']
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
@@ -379,6 +385,8 @@ def TeacherProfile(request):
                     ON DUPLICATE KEY UPDATE SSID= %s, Fname= %s, Lname= %s, Designation= %s, Department= %s, 
                     yr_of_exp= %s, Email= %s, Phno= %s,Skills= %s, Image= %s;"""
         cursor.execute(sql, (params + params) )
+        default_storage.save("FacultyImages/"+params[9], ContentFile(File.read())) # Downloading the file
+
     except (IntegrityError,OperationalError) as e:
         print(e)
         messages.error(request, e.args)
@@ -481,7 +489,9 @@ def TeacherFilePage(request, ClassName):
                     USN,
                     ClassName,
                     USN,
-                    ClassName)
+                    ClassName,
+                    request.POST.get('Comments')
+                    )
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
@@ -490,9 +500,9 @@ def TeacherFilePage(request, ClassName):
     #print(RepoName, USN, ClassName, )
     cur = connections['default'].cursor()
     try:
-        sql = """INSERT INTO Repository(Reponame, ssid, Class, Subject_code) 
+        sql = """INSERT INTO Repository(Reponame, ssid, Class, Subject_code, Comments) 
                         VALUES (%s, %s, %s, 
-                        ( SELECT Subject_code FROM Subject_Handle WHERE ssid = %s and Class = %s) )"""
+                        ( SELECT Subject_code FROM Subject_Handle WHERE ssid = %s and Class = %s), %s);"""
         cur.execute(sql, params)
     except (IntegrityError, OperationalError) as e:
         print(e)
@@ -597,7 +607,8 @@ def UserAdmin(request):
         cur  = connections['default'].cursor()
         sql = """SELECT Subject_Handle.*, Subject.Subject_name, Teacher.Fname, Teacher.Lname FROM Subject_Handle LEFT 
                     JOIN Teacher ON Subject_Handle.ssid = Teacher.ssid 
-                    JOIN Subject ON Subject.Subject_code = Subject_Handle.Subject_code;"""
+                    JOIN Subject ON Subject.Subject_code = Subject_Handle.Subject_code
+                    ORDER BY Subject_Handle.Class;"""
         cur.execute(sql)
         data = {str(i+1):{'ssid':item[0],'class':item[1], 'code':item[2], 'name':item[3], 'Fname':item[4], 'Lname':item[5]} for i,item in enumerate(cur.fetchall())}
         return render(request, "admin.html", {'data':data})

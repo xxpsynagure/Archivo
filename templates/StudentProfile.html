@@ -5,7 +5,13 @@
 
 {% block content %}
 {%include 'StudentNavbar.html'%}
-
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex flex-column align-items-center text-center">
+      <img src="{{root}}/{{studentImage}}" alt="{{root}}/{{studentImage}}" class="rounded-circle" width="150">
+    </div>
+  </div>
+</div>
 <br>
 <div class="center">
   <h1>Profile</h1>
@@ -15,7 +21,7 @@
           <br>
       {% endfor %}
   {% endif %}
-  <form action="#" method="post" class="form">{%csrf_token%}
+  <form action="#" method="post" class="form" enctype="multipart/form-data">{%csrf_token%}
     <div class="inputbox">
       <input type="text" required="required" name="usn" value="{{usn}}">
       <span>USN</span>
@@ -62,7 +68,7 @@
     </div>
     <br><br>
     <div class="inputbox">
-      <input type="file" name="Image" accept=".jpg, .jpeg, .png">
+      <input type="file" id="studentImage" name="StudentImage" accept=".png">
       <span>Chose your recent image</span>
     </div>
     <div class="inputbox">
@@ -71,6 +77,8 @@
     </div>
   </form>
 </div>
+<!-- <div><img src="{{root}}/{{studentImage}}" alt="{{root}}/{{studentImage}}"></div> -->
+
 {% endblock %}
 
 
