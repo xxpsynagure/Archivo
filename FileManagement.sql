@@ -227,3 +227,4 @@ CREATE TABLE User_Admin(
     passw VARCHAR(255) NOT NULL,
     FOREIGN KEY (ssid) REFERENCES Teacher(ssid)
 );
+INSERT INTO User_Admin VALUES ('4SOTSCS000', md5('admin'))

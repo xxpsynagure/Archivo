@@ -1,3 +1,4 @@
+from unicodedata import name
 from django.urls import path
 
 from . import views
@@ -20,6 +21,7 @@ urlpatterns = [
     path("notifications",views.notifications, name="notifications"),
     path("downloadFile", views.downloadFile, name="downloadFile"),
     path("deleteFile",views.deleteFile, name="deleteFile"),
-    path("UserAdmin/", views.UserAdmin, name="UserAdmin"),
+    path("UserAdmin/", views.UserAdminLogin, name="UserAdmin"),
+    path("UserAdmin/TeacherList", views.UserAdmin, name="UserAdminTeacherList")
 ]
 

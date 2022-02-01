@@ -119,6 +119,8 @@ def doLogin(request):
         data = cur.fetchall()
         # global USN
         request.session['user']=data[0][0]
+        print(request.session.get('user'))
+
         if(data[0][6]=='S'):
             print(request.session.get('user'))
             return redirect("StudentDashboard")
@@ -607,6 +609,31 @@ def deleteFile(request):
 
         messages.success(request, "File deleted succesfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+def UserAdminLogin(request):
+    if request.method != "POST":
+        return render(request, "adminLogin.html")
+
+    try:
+        params = (request.POST.get("userName"), request.POST.get("password")) 
+    except ObjectDoesNotExist as e:
+        print(e)
+        messages.warning(request, e.args)
+        return redirect('Login')
+
+    cur = connections['default'].cursor()
+    sql = "SELECT * FROM User_Admin WHERE ssid = %s AND  passw = md5(%s);"
+    try:
+        p = cur.execute(sql, params)
+    except (IntegrityError, OperationalError) as e:
+        print(e)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    print(p)
+    if p:
+        return redirect("/UserAdmin/TeacherList")
+    else:
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
 
 def UserAdmin(request):
     if request.method != "POST":
