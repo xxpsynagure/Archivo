@@ -7,13 +7,13 @@
 {%include 'StudentNavbar.html'%}
 <div class="card">
   <div class="card-body">
-    <div class="d-flex flex-column align-items-center text-center">
-      <img src="{{root}}/{{studentImage}}" alt="{{root}}/{{studentImage}}" class="rounded-circle" width="150">
-    </div>
+    <br>
   </div>
 </div>
 <br>
 <div class="center">
+  <center><img src="/files/{{ssid}}/{{studentImage}}" alt="/files/{{ssid}}/{{studentImage}}" class="rounded-circle" width="150" ></center>
+  <br>
   <h1>Profile</h1>
   {% if messages %}
       {% for message in messages %}

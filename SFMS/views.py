@@ -22,7 +22,7 @@ import base64
 # USN =''
 # Create your views here.
 def index(request):
-    request.session.flush()
+    # request.session.flush()
     return render(request,"index.html")
 
 def Login(request):

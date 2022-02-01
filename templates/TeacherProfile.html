@@ -7,20 +7,15 @@
 {%include 'TeacherNavbar.html'%}
 <div class="card">
   <div class="card-body">
-    <div class="d-flex flex-column align-items-center text-center">
-      <img src="{{root}}/{{TeacherImage}}" alt="{{root}}/{{TeacherImage}}" class="rounded-circle" width="150">
-    </div>
+    <br>
   </div>
 </div>
 <br>
 <div class="center">
+  <center><img src="/files/FacultyImages/{{TeacherImage}}" alt="/files/FacultyImages/{{TeacherImage}}" class="rounded-circle" width="150" ></center>
+  <br>
   <h1>Profile</h1>
-  {% if messages %}
-      {% for message in messages %}
-          <div>{{ message }}</div>
-          <br>
-      {% endfor %}
-  {% endif %}
+
   <form action="#" method="post" class="form" enctype="multipart/form-data">{%csrf_token%}
     <div class="inputbox">
       <input type="text" required="required" name="ssid" value= "{{ssid}}" >
