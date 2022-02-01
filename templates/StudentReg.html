@@ -54,7 +54,7 @@
                                             <option value="{{key}}">{{value}}</option>
                                         {% endfor %} 
                                     </select>
-                                    
+        
                             </div>
                             
                             <div class="form-group">
@@ -62,8 +62,15 @@
                                     <select class="form-control" id="branch" name ="branch">
                                         <option value="" disabled selected>Choose your branch</option>
                                         {% for key,value in branch.items %}  
-                                            <option value="{{key}}">{{value}}</option>
-                                        {% endfor %} 
+                                        <option value="{{key}}">{{value}}</option>
+                                        {% endfor %}
+                                        <!-- {% for key,value in collibranch.items %}
+                                            {% for key1,value1 in value.items %}  
+                                                {% if key == form.college %}
+                                                    <option value="{{key1}}">{{value1}}</option>
+                                                {% endif %}
+                                            {% endfor %} 
+                                        {% endfor %}  -->
                                     </select>
 
                             </div>

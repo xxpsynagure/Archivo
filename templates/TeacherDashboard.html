@@ -45,11 +45,6 @@
 <section id = "announcement">
 	<div class = "center">
 		<h1>Make an Announcement</h1>
-		{% if messages %}    
-            {% for message in messages %}
-                <div>{{ message.tags }}, {{ message }} </div>
-            {% endfor %}
-        {% endif %}
 		
 		<form action="#" method="post" class="form">{%csrf_token%}
 			<select class="inputbox" id="class" name="class" placeholder="Class">			 

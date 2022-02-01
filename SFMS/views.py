@@ -37,9 +37,9 @@ def StudentReg(request):
         except (IntegrityError,OperationalError) as e:
             print(e)
             messages.warning(request, 'Cannot fetch colleges')
-        params ={}
+        college ={}
         for item in cur:
-            params[item[0]]=item[1]
+            college[item[0]]=item[1]
 
         try:
             sql = "SELECT * FROM Branch"
@@ -47,13 +47,26 @@ def StudentReg(request):
         except (IntegrityError,OperationalError) as e:
             print(e)
             messages.warning(request, "Cannot fetch branches")
+
         branch = {}
         colli = []
         for item in cur:
             branch[item[0]] = item[1]
-            colli.append(item[2])
-        
-        return render(request, 'StudentReg.html', {'params':params}|{'branch':branch}|{'colli':colli})
+            colli.append(item[2])          
+        print(cur.fetchall())   
+
+        """ colli ={}
+        for item in cur:
+            branch ={}
+            branch[item[0]] = item[1]
+            dict = colli.get(item[2],0)
+            if(dict != 0):
+                colli[item[2]] = branch.update(dict)
+            else:
+                colli[item[2]] = branch
+        print()
+        print(colli) """
+        return render(request, 'StudentReg.html', {'params':college}|{'branch':branch}|{'colli':colli})
     except DatabaseError or DataError as e:
         print(e.args)
         messages.warning(request, "Cannot connect to Database \n Please Try again later")
@@ -221,7 +234,31 @@ def StudentDashboard(request):
         return redirect('Login')
     data = {items[0]: items[1] for items in cur}
     print(data)
-    return render(request, "StudentDashboard.html",{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
+
+    try:
+        cur1 = connections['default'].cursor()
+    except DatabaseError as e:
+        print(e)
+        messages.warning(request, "Cannot connect to Database \n Please try again later")
+        return redirect('Login')
+    try:
+        sql = """SELECT DISTINCT M.* FROM Message_recieved M
+                    WHERE M.Class = (SELECT S.Class FROM Student S WHERE S.usn = %s)
+                    ORDER BY M.Sent_time DESC LIMIT 1;"""
+        cur1.execute(sql, (request.session.get('user'),))
+    except IntegrityError or OperationalError as e:
+        print(e)
+        messages.warning(request, "Internal error in fetching messages")
+    message = cur1.fetchone()
+    dict = {}
+    dict['name'] = message[1] + ' ' + message[2]
+    dict['subject'] = message[3].capitalize()
+    dict['sent_time'] = message[4]
+    dict['title'] = message[5]
+    dict['content'] = message[6]
+    print()
+    print(dict)
+    return render(request, "StudentDashboard.html",{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data,'message':dict})
 
 
 def TeacherDashboard(request): 

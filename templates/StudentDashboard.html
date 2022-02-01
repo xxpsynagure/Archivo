@@ -12,7 +12,19 @@
         </div>
     </div>
 </header>
-
+<div class="card">
+	<div class="card-body text-center">
+		<h5 style="font-family: cursive;">RECENT NOTIFICATION</h5><br>
+		<marquee width="100%" direction="up" height="60px" class= "text-center" scrollamount="5">
+			<div class="media-body" >
+				<h6 >{{message.name}} <small><i style="padding-left: 100px;">Posted on {{message.sent_time}}</i></small></h6>
+				<p style="color:brown">{{message.subject}}</p>
+				<h5 style="font-family:sans-serif">{{message.title}}</h5>
+				<p>{{message.content}}</p>      
+			  </div>
+		</marquee>
+	</div>
+  </div>
 <section id="dashboard">
 
 <div class="container">
