@@ -20,6 +20,7 @@ import base64
 # USN =''
 # Create your views here.
 def index(request):
+    request.session.flush()
     return render(request,"index.html")
 
 def Login(request):
@@ -296,7 +297,7 @@ def StudentProfile(request):
                     request.POST.get("Portfolio_links"),
                     request.POST.get("About"),
                      )
-        File = request.FILES["StudentImage"]
+        # File = request.FILES["StudentImage"]
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
@@ -313,7 +314,7 @@ def StudentProfile(request):
                         ON DUPLICATE KEY UPDATE usn = %s, Fname= %s, Lname= %s, Class= %s, DOB= %s,
                         Email= %s, Phno= %s, Image= %s, Portfolio_links= %s, About= %s;"""
         cursor.execute(sql, (params + params) )
-        default_storage.save(params[7], ContentFile(File.read())) # Downloading the file
+        # default_storage.save(params[7], ContentFile(File.read())) # Downloading the file
 
     except (IntegrityError, OperationalError) as e:
         print(e)
@@ -366,9 +367,9 @@ def TeacherProfile(request):
                     request.POST.get("Email"),
                     request.POST.get("Phno"),
                     request.POST.get("Skills"),
-                    request.session.get('user')+"_"+request.FILES['TeacherImage'].name
+                    request.session.get('user')+"_"+request.POST.get('TeacherImage', False)
         )
-        File = request.FILES['TeacherImage']
+        # File = request.FILES['TeacherImage']
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
@@ -385,7 +386,7 @@ def TeacherProfile(request):
                     ON DUPLICATE KEY UPDATE SSID= %s, Fname= %s, Lname= %s, Designation= %s, Department= %s, 
                     yr_of_exp= %s, Email= %s, Phno= %s,Skills= %s, Image= %s;"""
         cursor.execute(sql, (params + params) )
-        default_storage.save("FacultyImages/"+params[9], ContentFile(File.read())) # Downloading the file
+        # default_storage.save("FacultyImages/"+params[9], ContentFile(File.read())) # Downloading the file
 
     except (IntegrityError,OperationalError) as e:
         print(e)
@@ -610,6 +611,7 @@ def UserAdmin(request):
                     JOIN Subject ON Subject.Subject_code = Subject_Handle.Subject_code
                     ORDER BY Subject_Handle.Class;"""
         cur.execute(sql)
+
         data = {str(i+1):{'ssid':item[0],'class':item[1], 'code':item[2], 'name':item[3], 'Fname':item[4], 'Lname':item[5]} for i,item in enumerate(cur.fetchall())}
         return render(request, "admin.html", {'data':data})
 
@@ -619,6 +621,12 @@ def UserAdmin(request):
   
     cur = connections['default'].cursor()
     sql = "INSERT INTO SUBJECT_Handle VALUES (%s, %s, %s);"
-    cur.execute(sql, (ssid, Class, Subcode))
+    try:
+            cur.execute(sql, (ssid, Class, Subcode))
+    except (IntegrityError, OperationalError) as e:
+        print(e)
+        messages.error(request, "Please check the data again")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+      
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     
