@@ -6,6 +6,7 @@ from webbrowser import Opera
 from django.conf import settings
 from django.db.models.fields import EmailField
 from django.db.utils import DataError, DatabaseError, IntegrityError
+from django.forms import MultiValueField
 from django.shortcuts import redirect, render
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseRedirect, request, response
 from django.contrib import messages
@@ -14,6 +15,7 @@ from django.db import OperationalError, connections
 from django.core.exceptions import *
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.utils.datastructures import MultiValueDictKeyError
 import json
 import base64
 
@@ -297,11 +299,12 @@ def StudentProfile(request):
                     request.POST.get("Portfolio_links"),
                     request.POST.get("About"),
                      )
-        # File = request.FILES["StudentImage"]
-    except ObjectDoesNotExist as e:
+        File = request.FILES["StudentImage"]
+    except (ObjectDoesNotExist,MultiValueDictKeyError) as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
-        return redirect('#')    
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+ 
     
     try:
         cursor = connections['default'].cursor()
@@ -314,7 +317,7 @@ def StudentProfile(request):
                         ON DUPLICATE KEY UPDATE usn = %s, Fname= %s, Lname= %s, Class= %s, DOB= %s,
                         Email= %s, Phno= %s, Image= %s, Portfolio_links= %s, About= %s;"""
         cursor.execute(sql, (params + params) )
-        # default_storage.save(params[7], ContentFile(File.read())) # Downloading the file
+        default_storage.save(params[7], ContentFile(File.read())) # Downloading the file
 
     except (IntegrityError, OperationalError) as e:
         print(e)
@@ -367,13 +370,14 @@ def TeacherProfile(request):
                     request.POST.get("Email"),
                     request.POST.get("Phno"),
                     request.POST.get("Skills"),
-                    request.session.get('user')+"_"+request.POST.get('TeacherImage', False)
+                    request.session.get('user')+"_"+request.FILES['TeacherImage'].name
         )
-        # File = request.FILES['TeacherImage']
-    except ObjectDoesNotExist as e:
+        File = request.FILES['TeacherImage']
+    except (ObjectDoesNotExist,MultiValueDictKeyError) as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
-        return redirect('#')    
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+  
 
     try:
         cursor = connections['default'].cursor()
@@ -386,7 +390,7 @@ def TeacherProfile(request):
                     ON DUPLICATE KEY UPDATE SSID= %s, Fname= %s, Lname= %s, Designation= %s, Department= %s, 
                     yr_of_exp= %s, Email= %s, Phno= %s,Skills= %s, Image= %s;"""
         cursor.execute(sql, (params + params) )
-        # default_storage.save("FacultyImages/"+params[9], ContentFile(File.read())) # Downloading the file
+        default_storage.save("FacultyImages/"+params[9], ContentFile(File.read())) # Downloading the file
 
     except (IntegrityError,OperationalError) as e:
         print(e)
@@ -429,7 +433,7 @@ def StudentFilePage(request, SubjectCode):
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
-        return redirect('#')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
     print(FileName.split('\\')[-1], RepoName, request.session.get('user'), type(File))
     FileName = FileName.split('\\')[-1]
@@ -496,7 +500,8 @@ def TeacherFilePage(request, ClassName):
     except ObjectDoesNotExist as e:
         print(e)
         messages.warning(request, "Form not filled, \n Please check again")
-        return redirect('#')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
     
     #print(RepoName, request.session.get('user'), ClassName, )
     cur = connections['default'].cursor()
