@@ -37,9 +37,9 @@ def StudentReg(request):
         except (IntegrityError,OperationalError) as e:
             print(e)
             messages.warning(request, 'Cannot fetch colleges')
-        college ={}
+        params ={}
         for item in cur:
-            college[item[0]]=item[1]
+            params[item[0]]=item[1]
 
         try:
             sql = "SELECT * FROM Branch"
@@ -47,26 +47,13 @@ def StudentReg(request):
         except (IntegrityError,OperationalError) as e:
             print(e)
             messages.warning(request, "Cannot fetch branches")
-
         branch = {}
         colli = []
         for item in cur:
             branch[item[0]] = item[1]
-            colli.append(item[2])          
-        print(cur.fetchall())   
-
-        """ colli ={}
-        for item in cur:
-            branch ={}
-            branch[item[0]] = item[1]
-            dict = colli.get(item[2],0)
-            if(dict != 0):
-                colli[item[2]] = branch.update(dict)
-            else:
-                colli[item[2]] = branch
-        print()
-        print(colli) """
-        return render(request, 'StudentReg.html', {'params':college}|{'branch':branch}|{'colli':colli})
+            colli.append(item[2])
+        
+        return render(request, 'StudentReg.html', {'params':params}|{'branch':branch}|{'colli':colli})
     except DatabaseError or DataError as e:
         print(e.args)
         messages.warning(request, "Cannot connect to Database \n Please Try again later")
@@ -234,31 +221,7 @@ def StudentDashboard(request):
         return redirect('Login')
     data = {items[0]: items[1] for items in cur}
     print(data)
-
-    try:
-        cur1 = connections['default'].cursor()
-    except DatabaseError as e:
-        print(e)
-        messages.warning(request, "Cannot connect to Database \n Please try again later")
-        return redirect('Login')
-    try:
-        sql = """SELECT DISTINCT M.* FROM Message_recieved M
-                    WHERE M.Class = (SELECT S.Class FROM Student S WHERE S.usn = %s)
-                    ORDER BY M.Sent_time DESC LIMIT 1;"""
-        cur1.execute(sql, (request.session.get('user'),))
-    except IntegrityError or OperationalError as e:
-        print(e)
-        messages.warning(request, "Internal error in fetching messages")
-    message = cur1.fetchone()
-    dict = {}
-    dict['name'] = message[1] + ' ' + message[2]
-    dict['subject'] = message[3].capitalize()
-    dict['sent_time'] = message[4]
-    dict['title'] = message[5]
-    dict['content'] = message[6]
-    print()
-    print(dict)
-    return render(request, "StudentDashboard.html",{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data,'message':dict})
+    return render(request, "StudentDashboard.html",{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
 
 
 def TeacherDashboard(request): 
@@ -341,8 +304,11 @@ def StudentProfile(request):
         File = request.FILES["StudentImage"]
     except (ObjectDoesNotExist,MultiValueDictKeyError) as e:
         print(e)
-        messages.warning(request, "Form not filled, \n Please check again")
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        if MultiValueDictKeyError:
+            File = 'nothing'
+        else:
+            messages.warning(request, "Form not filled, \n Please check again")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
  
     
     try:
@@ -665,7 +631,7 @@ def UserAdminLogin(request):
     except (IntegrityError, OperationalError) as e:
         print(e)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-    print(p)
+
     if p:
         return redirect("/UserAdmin/TeacherList")
     else:
@@ -684,18 +650,28 @@ def UserAdmin(request):
         data = {str(i+1):{'ssid':item[0],'class':item[1], 'code':item[2], 'name':item[3], 'Fname':item[4], 'Lname':item[5]} for i,item in enumerate(cur.fetchall())}
         return render(request, "admin.html", {'data':data})
 
-    ssid = request.POST.get('ssid')
-    Class = request.POST.get('Class')
-    Subcode = request.POST.get('Subcode')
-  
-    cur = connections['default'].cursor()
-    sql = "INSERT INTO SUBJECT_Handle VALUES (%s, %s, %s);"
-    try:
-            cur.execute(sql, (ssid, Class, Subcode))
-    except (IntegrityError, OperationalError) as e:
-        print(e)
-        messages.error(request, "Please check the data again")
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-      
+    if 'delete' in request.POST:
+        ssid = request.POST.get('delete')
+        cur = connections['default'].cursor()
+        sql = "DELETE FROM Subject_handle where ssid = %s"
+        try:
+            cur.execute(sql, (ssid,))
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+
+
+    else:    
+        ssid = request.POST.get('ssid')
+        Class = request.POST.get('Class')
+        Subcode = request.POST.get('Subcode')
+
+        cur = connections['default'].cursor()
+        sql = "INSERT INTO SUBJECT_Handle VALUES (%s, %s, %s);"
+        try:
+                cur.execute(sql, (ssid, Class, Subcode))
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.error(request, "Please check the data again")
+
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     

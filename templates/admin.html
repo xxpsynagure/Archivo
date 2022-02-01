@@ -5,7 +5,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="{%static 'css/index.css' %}">
-    <title>Document</title>
+    <title>Admin</title>
 </head>
 <body>
     <div class="container">
@@ -35,6 +35,7 @@
                                         <th></th>
                                     </tr>
                                 </thead>
+                                <form action="" method="post" id="admin-form">{%csrf_token%}
                                 <tbody>
                                     {% for key, value in data.items %}
                                     <tr>
@@ -49,10 +50,12 @@
                                         <td>{{value.code}}</td>
                                         <td>{{value.name}}</td>
                                         <td>{{value.dept}}</td>
-                                        <td><span class="badge bg-danger">Delete</span></td>
+                                        <!-- <td><a href="#" onclick="Document.getElementById('submit-inp').click();"><span class="badge bg-danger">Delete</span></a></td> -->
+                                        <td><button class="badge bg-danger" name="delete" value="{{value.ssid}}">Delete</button></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
+                                </form>
                             </table>
                         </div>
                     </div>

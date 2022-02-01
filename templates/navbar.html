@@ -58,20 +58,29 @@
   <!-- Navbar -->
 <nav class="navbar navbar-dark bg-primary">
   <div class="container-fluid">
-    <form class="d-flex input-group w-auto">
+    <div class="d-flex input-group w-auto">
       <input
-        type="search"
+        type="text" id="search"
         class="form-control rounded"
         placeholder="Search"
         aria-label="Search"
         aria-describedby="search-addon"
-      />
-      <span class="input-group-text text-white border-0" id="search-addon">
+      >
+      <button class="input-group-text text-white border-0" id="search-addon" onclick="searchFunc();">
         <i class="fas fa-search"></i>
-      </span>
-    </form>
+      </button>
+    </div>
   </div>
 </nav>
 
 <!-- Scroll to Top Button-->
 <a class="scroll-to-top rounded" href="#"><i class="fas fa-angle-up"></i></a>
+
+<script>
+  function searchFunc() {
+    let text = document.getElementsByClassName('container').innerHTML;
+    let re = new RegExp(searched,"g"); // search for all instances
+		let newText = text.replace(re, `<mark>${searched}</mark>`);
+		document.getElementsByClassName("container").innerHTML = newText;
+  }
+</script>
