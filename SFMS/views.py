@@ -250,6 +250,9 @@ def StudentDashboard(request):
         print(e)
         messages.warning(request, "Internal error in fetching messages")
     message = cur1.fetchone()
+    if message is None:
+        return render(request, "StudentDashboard.html",{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'}|{'subject':data})
+
     dict = {}
     dict['name'] = message[1] + ' ' + message[2]
     dict['subject'] = message[3].capitalize()
