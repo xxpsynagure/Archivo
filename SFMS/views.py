@@ -128,7 +128,7 @@ def doLogin(request):
         return redirect('Login')
 
     if(p):
-        messages.success(request, "Login successful")
+        # messages.success(request, "Login successful")
         data = cur.fetchall()
         # global USN
         request.session['user']=data[0][0]
@@ -180,7 +180,7 @@ def doReg(request):
             messages.warning(request, refer[str(e.args).split('.')[-1][:-3]])
             return redirect(request.META['HTTP_REFERER'][22:])
 
-        messages.success(request, "Registration Succesful")
+        # messages.success(request, "Registration Succesful")
         # global USN
         # USN = usn
         # print(USN)
@@ -689,10 +689,11 @@ def UserAdmin(request):
 
     if 'delete' in request.POST:
         ssid = request.POST.get('delete')
+        ssid, subcode = ssid.split('+')
         cur = connections['default'].cursor()
-        sql = "DELETE FROM Subject_handle where ssid = %s"
+        sql = "DELETE FROM Subject_handle where ssid = %s AND Subject_code = %s"
         try:
-            cur.execute(sql, (ssid,))
+            cur.execute(sql, (ssid, subcode,))
         except (IntegrityError, OperationalError) as e:
             print(e)
 
