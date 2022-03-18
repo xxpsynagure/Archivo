@@ -173,9 +173,11 @@ CREATE TABLE File (
 )
 
 -- ----------------------TRIGGER---------------------------------
+
 CREATE TRIGGER set_created_date
 BEFORE INSERT ON File FOR EACH ROW
     SET New.Uploaded = NOW();
+    
 -- ----------------------TRIGGER-----------------------------------
 
 CREATE TABLE Notification (
@@ -206,11 +208,11 @@ END//
 
 
 CREATE VIEW Message_recieved AS 
-SELECT T.Image, T.Fname, T.Lname, S.Subject_name, N.Sent_time, N.Title, N.Message, N.CLass
+SELECT DISTINCT T.Image, T.Fname, T.Lname, S.Subject_name, N.Sent_time, N.Title, N.Message, N.CLass
 FROM Notification N
-RIGHT JOIN Teacher T ON N.ssid = T.ssid
-LEFT JOIN Subject_Handle SH ON N.ssid = SH.ssid
-RIGHT JOIN Subject S ON S.Subject_code = SH.Subject_code 
+JOIN Teacher T ON N.ssid = T.ssid
+JOIN Subject_Handle SH ON N.ssid = SH.ssid
+JOIN Subject S ON S.Subject_code = SH.Subject_code 
 JOIN Class C ON N.Class = C.Class;
 
 DELIMITER |

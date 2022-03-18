@@ -574,6 +574,7 @@ def notifications(request):
     data=[]
     for tuple in cur.fetchall():
         dict = {}
+        dict['TeacherImage'] = tuple[0]
         dict['name'] = tuple[1] + ' ' + tuple[2]
         dict['subject'] = tuple[3].capitalize()
         dict['sent_time'] = tuple[4]
