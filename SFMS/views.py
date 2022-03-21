@@ -176,7 +176,7 @@ def doReg(request):
             cursor.execute(sql, params)
         except IntegrityError or OperationalError as e:
             print(e)
-            refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Please fill in details"}
+            refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Please fill in details", 'email_check':"Minimum 3 characters required for domain of mailId"}
             messages.warning(request, refer[str(e.args).split('.')[-1][:-3]])
             return redirect(request.META['HTTP_REFERER'][22:])
 
@@ -195,16 +195,19 @@ def doReg(request):
 
 
 def greeting(request):
-    cur = connections['default'].cursor() 
-    print(request.session.get('user'))
     try:
-        cur.execute("CALL greetings(%s)", (request.session.get('user'),))
-    except (IntegrityError, OperationalError) as e:
-        print(e)
-        messages.warning(request, "Error in greeting , So exiting")
+        cur = connections['default'].cursor() 
+        print(request.session.get('user'))
+        try:
+            cur.execute("CALL greetings(%s)", (request.session.get('user'),))
+        except (IntegrityError, OperationalError) as e:
+            print(e)
+            messages.warning(request, "Error in greeting , So exiting")
+            return redirect('/')
+        data = cur.fetchone()
+        return data[0]
+    except Exception:
         return redirect('/')
-    data = cur.fetchone()
-    return data[0]
 
 def trial(request): #trial purpose
     # posts = models.Registration.objects.all()
@@ -669,7 +672,6 @@ def UserAdminLogin(request):
     except (IntegrityError, OperationalError) as e:
         print(e)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-    print(p)
     if p:
         return redirect("/UserAdmin/TeacherList")
     else:
@@ -690,11 +692,12 @@ def UserAdmin(request):
 
     if 'delete' in request.POST:
         ssid = request.POST.get('delete')
-        ssid, subcode = ssid.split('+')
+        ssid, subcode, classs = ssid.split('+')
         cur = connections['default'].cursor()
-        sql = "DELETE FROM Subject_handle where ssid = %s AND Subject_code = %s"
+        sql = "DELETE FROM Subject_handle where ssid = %s AND Subject_code = %s AND Class = %s"
+        messages.warning(request, "User deleted Successfully")
         try:
-            cur.execute(sql, (ssid, subcode,))
+            cur.execute(sql, (ssid, subcode, classs))
         except (IntegrityError, OperationalError) as e:
             print(e)
 

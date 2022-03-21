@@ -35,7 +35,7 @@
                                         <th></th>
                                     </tr>
                                 </thead>
-                                <form action="" method="post" id="admin-form">{%csrf_token%}
+                                <form action="" method="post" id="admin-form" onsubmit="return confirm('Do you want to delete the faculty? ');">{%csrf_token%}
                                 <tbody>
                                     {% for key, value in data.items %}
                                     <tr>
@@ -51,7 +51,7 @@
                                         <td>{{value.name}}</td>
                                         <td>{{value.dept}}</td>
                                         <!-- <td><a href="#" onclick="Document.getElementById('submit-inp').click();"><span class="badge bg-danger">Delete</span></a></td> -->
-                                        <td><button class="badge bg-danger" name="delete" value="{{value.ssid}}">Delete</button></td>
+                                        <td><button class="badge bg-danger" name="delete" id="dlt" value="{{value.ssid}}+{{value.code}}+{{value.class}}">Delete</button></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -107,12 +107,16 @@
     </div>
 {% if messages %}
     {% for message in messages %}
-        <div id="msg" style="display: none;">{{message}}</div>
+        {% if message.tags == 'error' %}
+            <div id="msg" style="display: none;">{{message}}</div>
+        {% elif message.tags == 'warning' %}
+            <div id="msg" style="display: none;">{{message}}</div>
+        {% endif %}
     {% endfor %}
 {% endif %}
 
 <script>
-    alert(document.getElementById("msg").textContent)
+    confirm(document.getElementById("msg").textContent)
 </script>
 
 </body>
