@@ -59,13 +59,23 @@
                             </div>
                             
                             <div class="form-group">
-                                    
-                                    <select class="form-control" id="branch" name ="branch">
+                                <select class="form-control" id="branch" name ="branch">
+                                    <option value="" disabled selected>Choose your branch</option>
+                                    {% for key,value in branch.items %}
+                                        {%if key == "SJEC" %}
+                                            {% for subkey,subval in value.items %}  
+                                                <option value="{{subkey}}">{{subval}}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                        
+                                    {% endfor %}
+
+                                    <!-- <select class="form-control" id="branch" name ="branch">
                                         <option value="" disabled selected>Choose your Department</option>
                                         {% for key,value in branch.items %}  
                                             <option value="{{key}}">{{value}}</option>
                                         {% endfor %} 
-                                    </select>
+                                    </select> -->
 
                             </div>
                             

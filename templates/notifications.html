@@ -13,13 +13,13 @@
 
     {% for dict in message%}
     <div class="media border p-3" style="background-color:{%cycle '#E6E6FA' '#fadadd' '#f5f5f5' %} ;">     
-    <img src="files/FacultyImages/{{dict.TeacherImage}}" alt="files/FacultyImages/{{dict.TeacherImage}}" class="mr-3 mt-3 rounded-circle" style="width:50px;">
+    <img src="/files/FacultyImages/{{dict.TeacherImage}}" alt="/files/FacultyImages/{{dict.TeacherImage}}" class="mr-3 mt-3 rounded-circle" style="width:50px;">
 
       <div class="media-body" >
         <h5 style="font-family:sans-serif">{{dict.name}} <small><i style="float: right;">Posted on {{dict.sent_time}}</i></small></h5>
         <p style="color:brown">{{dict.subject}}</p>
         
-        <h5 style="text-align: center; font-family: cursive;" class="mb-1" >{{dict.title}}</h5>
+        <h5 style="text-align: center; font-family: cursive;" class="mb-1" >{{dict.title}}</h5><br>
         <p>{{dict.content}}</p>      
       </div>
     </div>
