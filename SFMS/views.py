@@ -747,11 +747,7 @@ def UserAdmin(request):
         
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-def downloadAllFile(request):
-    # filedata = {1:'one', 2:'two', 3:'three', 4:'', 5:'', 6:'', 7:'', 8:'', 9:'', 10:''}
-    # print(request.session['user'])
-    # print(MEDIA_ROOT)
-
+def archive(request):
     if request.method == "POST":
         shutil.make_archive(settings.MEDIA_ROOT+request.session['user'], 'zip', settings.MEDIA_ROOT+request.session['user'])
 
