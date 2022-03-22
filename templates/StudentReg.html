@@ -48,7 +48,7 @@
                             </div>
                
                             <div class="form-group">        
-                                    <select class="form-control" id="college" name ="college">
+                                    <select class="form-control" id="college" name ="college" >
                                         <option value="" disabled selected>Choose your college</option>
                                         {% for key,value in params.items %}  
                                             <option value="{{key}}">{{value}}</option>
@@ -61,8 +61,13 @@
                                     
                                     <select class="form-control" id="branch" name ="branch">
                                         <option value="" disabled selected>Choose your branch</option>
-                                        {% for key,value in branch.items %}  
-                                        <option value="{{key}}">{{value}}</option>
+                                        {% for key,value in branch.items %}
+                                            {%if key == "SJEC" %}
+                                                {% for subkey,subval in value.items %}  
+                                                    <option value="{{subkey}}">{{subval}}</option>
+                                                {% endfor %}
+                                            {% endif %}
+                                            
                                         {% endfor %}
                                         <!-- {% for key,value in collibranch.items %}
                                             {% for key1,value1 in value.items %}  
@@ -75,8 +80,6 @@
 
                             </div>
                             
-                            
-
                                 <!-- <div class="form-button">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true">

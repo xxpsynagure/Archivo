@@ -48,12 +48,20 @@ def StudentReg(request):
             print(e)
             messages.warning(request, "Cannot fetch branches")
 
-        branch = {}
+        """ branch = {}
         colli = []
         for item in cur:
             branch[item[0]] = item[1]
             colli.append(item[2])          
-        print(cur.fetchall())   
+        print(cur.fetchall()) """  
+
+        branch ={}
+        for item in cur:
+            if(item[2] not in branch):
+                branch[item[2]]={item[0] : item[1]}
+                continue
+            branch[item[2]][item[0]] = item[1]
+        #print(branch)
 
         """ colli ={}
         for item in cur:
@@ -66,7 +74,7 @@ def StudentReg(request):
                 colli[item[2]] = branch
         print()
         print(colli) """
-        return render(request, 'StudentReg.html', {'params':college}|{'branch':branch}|{'colli':colli})
+        return render(request, 'StudentReg.html', {'params':college}|{'branch':branch})
     except DatabaseError or DataError as e:
         print(e.args)
         messages.warning(request, "Cannot connect to Database \n Please Try again later")
