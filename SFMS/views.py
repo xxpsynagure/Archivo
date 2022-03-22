@@ -2,6 +2,7 @@ from email.policy import default
 from fileinput import filename
 import mimetypes
 import os
+import shutil
 from webbrowser import Opera
 from django.conf import settings
 from django.db.models.fields import EmailField
@@ -10,6 +11,7 @@ from django.forms import MultiValueField
 from django.shortcuts import redirect, render
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseRedirect, request, response
 from django.contrib import messages
+from FileManagementSystem.settings import MEDIA_ROOT
 from SFMS import models
 from django.db import OperationalError, connections
 from django.core.exceptions import *
@@ -155,7 +157,7 @@ def doLogin(request):
         data = cur.fetchall()
         # global USN
         request.session['user']=data[0][0]
-        print(request.session.get('user'))
+        logging.info("USER is: "+request.session.get('user'))
 
         if(data[0][6]=='S'):
             print(request.session.get('user'))
@@ -744,4 +746,27 @@ def UserAdmin(request):
             return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
         
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+def downloadAllFile(request):
+    # filedata = {1:'one', 2:'two', 3:'three', 4:'', 5:'', 6:'', 7:'', 8:'', 9:'', 10:''}
+    # print(request.session['user'])
+    # print(MEDIA_ROOT)
+
+    if request.method == "POST":
+        shutil.make_archive(settings.MEDIA_ROOT+request.session['user'], 'zip', settings.MEDIA_ROOT+request.session['user'])
+
+        path = open(settings.MEDIA_ROOT+request.session['user']+'.zip', 'rb')
+    # Set the mime type
+        mime_type, _ = mimetypes.guess_type(settings.MEDIA_ROOT+request.session['user']+'.zip')
+    # Set the return value of the HttpResponse
+        response = HttpResponse(path, content_type=mime_type)
+    # Set the HTTP header for sending to browser
+        response['Content-Disposition'] = "attachment; filename=%s" % request.session['user']+'.zip'
+    # Return the response value
+        return response
+
+    filedata = [file for file in os.listdir(settings.MEDIA_ROOT+request.session['user'])]
+    logging.info(filedata)
+    return render(request, "downloadAll.html", {'username':greeting(request), 'filedata':filedata, 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile'})
         
+    

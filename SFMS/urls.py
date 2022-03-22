@@ -16,12 +16,13 @@ urlpatterns = [
     path("TeacherDashboard",views.TeacherDashboard, name="TeacherDashboard"),
     path("StudentDashboard/StudentProfile", views.StudentProfile, name="StudentProfile"),
     path("TeacherDashboard/TeacherProfile", views.TeacherProfile, name="TeacherProfile"),
+    path("StudentDashboard/downloadAllFile", views.downloadAllFile, name="downloadAllFile"),
     path("StudentDashboard/<SubjectCode>", views.StudentFilePage, name="StudentFilePage"),
     path("TeacherDashboard/<ClassName>", views.TeacherFilePage, name="TeacherFilePage"),
     path("notifications",views.notifications, name="notifications"),
     path("downloadFile", views.downloadFile, name="downloadFile"),
     path("deleteFile",views.deleteFile, name="deleteFile"),
     path("UserAdmin/", views.UserAdminLogin, name="UserAdmin"),
-    path("UserAdmin/TeacherList", views.UserAdmin, name="UserAdminTeacherList")
+    path("UserAdmin/TeacherList", views.UserAdmin, name="UserAdminTeacherList"),
 ]
 

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+{%include 'StudentNavbar.html'%}
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card-box">
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6">
+                            <h4 class="header-title m-b-30">My Files</h4>
+                        </div>
+                    </div>
+
+                    <div class="drive-wrapper drive-grid-view">
+                        <div class="grid-items-wrapper">
+                            <!-- start the for loop from here for file tiles -->
+                            {% for key in filedata %}
+                            <div class="drive-item module text-center">
+                                <div class="drive-item-inner module-inner">
+                                    <div class="drive-item-title" id="selected">{{key}}</div>
+                                    <div class="drive-item-thumb">
+                                        <a href="#"><i class="fa fa-file"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                        </div>
+                    </div>
+                        
+                    </div>
+                    <form action="#" method="post">{%csrf_token%}
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-outline-danger w-md waves-effect waves-light"><i class="mdi mdi-refresh"></i> Download Zip</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- container -->
+</div>
+{% endblock %}
+
