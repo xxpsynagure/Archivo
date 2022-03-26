@@ -48,8 +48,8 @@
                             </div>
                
                             <div class="form-group">        
-                                    <select class="form-control" id="college" name ="college" >
-                                        <option value="" disabled selected>Choose your college</option>
+                                    <select required class="form-control" id="college" name ="college" >
+                                        <option value="noCollege" disabled selected>Choose your college</option>
                                         {% for key,value in params.items %}  
                                             <option value="{{key}}">{{value}}</option>
                                         {% endfor %} 
@@ -59,8 +59,8 @@
                             
                             <div class="form-group">
                                     
-                                    <select class="form-control" id="branch" name ="branch">
-                                        <option value="" disabled selected>Choose your branch</option>
+                                    <select required class="form-control" id="branch" name ="branch">
+                                        <option value="nil" disabled selected>Choose your branch</option>
                                         {% for key,value in branch.items %}
                                             {%if key == "SJEC" %}
                                                 {% for subkey,subval in value.items %}  

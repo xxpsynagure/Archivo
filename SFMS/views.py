@@ -200,10 +200,11 @@ def doReg(request):
         try:
             sql = "INSERT INTO Registration VALUES(%s, %s, %s, md5(%s), %s, %s, %s);"   
             cursor.execute(sql, params)
-        except IntegrityError or OperationalError as e:
+        except (IntegrityError,OperationalError,DataError) as e:
             print(e)
-            refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Please fill in details", 'email_check':"Minimum 3 characters required for domain of mailId"}
-            messages.warning(request, refer[str(e.args).split('.')[-1][:-3]])
+            refer = {'PRIMARY':"USN/SSID already in use,\n Please Login", 'Username':"Username taken,\nPlease chose a new Username", 'Email':"Email taken, \nUse other Email","":"Minimum 3 characters required for domain of mailId", 'email_check':"Minimum 3 characters required for domain of mailId", '(1048, "Column \'College\' cannot be nul':"Please select the college"}
+            messages.warning(request, refer.get(str(e.args).split('.')[-1][:-3], "Please fill the details correctly"))
+            logging.warning(str(e.args))
             return redirect(request.META['HTTP_REFERER'][22:])
 
         # messages.success(request, "Registration Succesful")
@@ -353,7 +354,7 @@ def StudentProfile(request):
             except (IntegrityError, OperationalError) as e:
                 print(e)
                 messages.warning(request, "Cannot fetch profile data from Registration table of database")
-            data = cur.fetchone()
+            data = cur.fetchone()            
             return render(request, 'StudentProfile.html',{'username':greeting(request), 'url':'/StudentDashboard', 'Purl':'/StudentDashboard/StudentProfile',
                                                         'usn':data[0], 'Fname':'', 'Lname':'', 'Branch':data[4], 'Sem':'', 'Sec':'',
                                                         'DOB':'', 'Email':data[2], 'Phno':'', 'Portfolio_links':'', 'About':''})
@@ -388,7 +389,7 @@ def StudentProfile(request):
     except DatabaseError as e:
         print(e)
         messages.warning(request, "Cannot connect to Database \n Please try again later")
-        return redirect('/#Error')
+        raise Http404
     try:
         sql =  """INSERT INTO Student VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
                         ON DUPLICATE KEY UPDATE usn = %s, Fname= %s, Lname= %s, Class= %s, DOB= %s,
