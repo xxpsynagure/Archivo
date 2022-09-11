@@ -10,7 +10,11 @@
 
 ### Documentation
 
-<object data = "[Student File Management System.pdf](https://github.com/xxpsynagure/Archivo/files/9543170/Student.File.Management.System.pdf)" type = "application/pdf" width = "100%"> </object>
+<object data="https://github.com/xxpsynagure/Archivo/files/9543170/Student.File.Management.System.pdf" type="application/pdf" width="100%">
 
-<embed src = "[Student File Management System.pdf](https://github.com/xxpsynagure/Archivo/files/9543170/Student.File.Management.System.pdf)" type = "application/pdf" width = "100%">
+<embed src = "https://github.com/xxpsynagure/Archivo/files/9543170/Student.File.Management.System.pdf" type="application/pdf" width="100%">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://github.com/xxpsynagure/Archivo/files/9543170/Student.File.Management.System.pdf">Download PDF</a>.</p>
+</embed>
+</object>
+
 
